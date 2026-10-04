@@ -191,25 +191,25 @@ Deployment: Docker Compose
 ```text
 sentinel-ai/
 |
-├── contracts/
-│   ├── attack_run.schema.json
-│   ├── target_response.schema.json
-│   ├── judge_verdict.schema.json
-│   ├── finding.schema.json
-│   └── report.schema.json
-├── attack_engine/
-├── judge/
-├── cyberv_engine/
-├── backend/
-├── frontend/
-├── targets/
-├── eval/
-├── docs/
-├── tests/
-├── .env.example
-├── .gitignore
-├── docker-compose.yml
-└── README.md
+â”œâ”€â”€ contracts/
+â”‚   â”œâ”€â”€ attack_run.schema.json
+â”‚   â”œâ”€â”€ target_response.schema.json
+â”‚   â”œâ”€â”€ judge_verdict.schema.json
+â”‚   â”œâ”€â”€ finding.schema.json
+â”‚   â””â”€â”€ report.schema.json
+â”œâ”€â”€ attack_engine/
+â”œâ”€â”€ judge/
+â”œâ”€â”€ cyberv_engine/
+â”œâ”€â”€ backend/
+â”œâ”€â”€ frontend/
+â”œâ”€â”€ targets/
+â”œâ”€â”€ eval/
+â”œâ”€â”€ docs/
+â”œâ”€â”€ tests/
+â”œâ”€â”€ .env.example
+â”œâ”€â”€ .gitignore
+â”œâ”€â”€ docker-compose.yml
+â””â”€â”€ README.md
 ```
 
 ## 11. Core Contracts
@@ -271,11 +271,11 @@ Ownership does not mean isolated work. All four members coordinate around shared
 
 ---
 
-# 13. MEMBER 1 — AI/ML
+# 13. MEMBER 1 â€” AI/ML
 
 ## Role
 
-**AI/ML Engineer — Judge & Evaluation**
+**AI/ML Engineer â€” Judge & Evaluation**
 
 ## Main Ownership
 
@@ -289,7 +289,7 @@ Ownership does not mean isolated work. All four members coordinate around shared
 - Evaluation experiments
 - Ollama model integration for judging
 
-## P0 — Week 1
+## P0 â€” Week 1
 
 - Create `judge/`
 - Propose `JudgeVerdict`
@@ -299,33 +299,33 @@ Ownership does not mean isolated work. All four members coordinate around shared
 - Prototype Presidio
 - Prototype LLM judge
 
-## P1 — Weeks 2–3
+## P1 â€” Weeks 2â€“3
 
 - Consume real TargetResponse objects
 - Normalize judge input/output
 - Support baseline execution
 
-## P2 — Weeks 3–4
+## P2 â€” Weeks 3â€“4
 
 Implement B0/B1/B2/B3 and create the initial labeled dataset and labeling protocol.
 
-## P3 — Weeks 5–6
+## P3 â€” Weeks 5â€“6
 
 Implement the AI side of Sensor/signals/confidence/score and support A1/A2 with the controller owner.
 
-## P4 — Weeks 7–8
+## P4 â€” Weeks 7â€“8
 
 Expose judge results to API/dashboard with verdict, confidence, reason, signals, and judge type.
 
-## P5 — Weeks 9–10
+## P5 â€” Weeks 9â€“10
 
 Run experiments and calculate Precision, Recall, F1, FPR, FNR, Kappa, LLM calls, latency, and agreed ablations.
 
-## P6 — Week 11
+## P6 â€” Week 11
 
 Optimize, test, document model versions/seeds, and remove unstable behavior.
 
-## P7 — Week 12
+## P7 â€” Week 12
 
 Freeze results, produce AI/evaluation documentation, and prepare the research presentation.
 
@@ -335,11 +335,11 @@ Freeze results, produce AI/evaluation documentation, and prepare the research pr
 
 ---
 
-# 14. MEMBER 2 — CYBER #1
+# 14. MEMBER 2 â€” CYBER #1
 
 ## Role
 
-**Cyber Security — Attack Engine Lead**
+**Cyber Security â€” Attack Engine Lead**
 
 ## Main Ownership
 
@@ -352,7 +352,7 @@ Freeze results, produce AI/evaluation documentation, and prepare the research pr
 - OWASP attack mapping
 - Reproducible scan execution
 
-## P0 — Week 1
+## P0 â€” Week 1
 
 - Create `attack_engine/`
 - Install/test garak
@@ -362,31 +362,31 @@ Freeze results, produce AI/evaluation documentation, and prepare the research pr
 - Propose `AttackRun`
 - Build initial runner abstraction
 
-## P1 — Weeks 2–3
+## P1 â€” Weeks 2â€“3
 
 Build AttackRunner with garak/PyRIT. Support Prompt Injection, System Prompt Leakage, Data Leakage, RAG Leakage, and Jailbreak. Connect to Target Adapter and store attempts. Add OWASP mapping.
 
-## P2 — Weeks 3–4
+## P2 â€” Weeks 3â€“4
 
 Provide attack cases for baseline judges, repeatable test executions, normalized TargetResponses, and evaluation dataset generation.
 
-## P3 — Weeks 5–6
+## P3 â€” Weeks 5â€“6
 
 Support second-round attack selection and attack variants for adaptive testing.
 
-## P4 — Weeks 7–8
+## P4 â€” Weeks 7â€“8
 
 Connect attack execution to dashboard and scan-progress storage.
 
-## P5 — Weeks 9–10
+## P5 â€” Weeks 9â€“10
 
 Run attack suites across the frozen evaluation setup and track attack counts/execution cost.
 
-## P6 — Week 11
+## P6 â€” Week 11
 
 Security test the attack engine, including timeouts, rate limits, errors, reproducibility, and pinned tool versions.
 
-## P7 — Week 12
+## P7 â€” Week 12
 
 Final attack-engine documentation, reproducibility package, and demo scenarios.
 
@@ -396,11 +396,11 @@ AttackRunner, garak/PyRIT integration, attack cases, mappings, second-round supp
 
 ---
 
-# 15. MEMBER 3 — CYBER #2
+# 15. MEMBER 3 â€” CYBER #2
 
 ## Role
 
-**Cyber Security — Security Validation, Evidence & CTI Lead**
+**Cyber Security â€” Security Validation, Evidence & CTI Lead**
 
 ## Main Ownership
 
@@ -416,7 +416,7 @@ AttackRunner, garak/PyRIT integration, attack cases, mappings, second-round supp
 - Security review
 - Final security interpretation
 
-## P0 — Week 1
+## P0 â€” Week 1
 
 - Create `cyberv_engine/`
 - Define LEAK / NO_LEAK / AMBIGUOUS
@@ -425,31 +425,31 @@ AttackRunner, garak/PyRIT integration, attack cases, mappings, second-round supp
 - Propose `Finding`
 - Create initial OWASP mapping
 
-## P1 — Weeks 2–3
+## P1 â€” Weeks 2â€“3
 
 Define security scenarios with goal, attack, expected safe behavior, expected vulnerable behavior, ground truth, and evidence. Validate the local RAG target.
 
-## P2 — Weeks 3–4
+## P2 â€” Weeks 3â€“4
 
 Define potential/confirmed/rejected finding states, evidence rules, human labeling protocol, and dataset quality checks.
 
-## P3 — Weeks 5–6
+## P3 â€” Weeks 5â€“6
 
 Own the security side of Sensor signals, confidence interpretation, evidence signals, and controller safety. Help define when a second round is justified.
 
-## P4 — Weeks 7–8
+## P4 â€” Weeks 7â€“8
 
 Define the security presentation of findings: evidence, attack category, target, confidence, severity, and OWASP mapping.
 
-## P5 — Weeks 9–10
+## P5 â€” Weeks 9â€“10
 
 Lead evaluation methodology. Ensure frozen test set, correct ground truth, documented human labeling, seeds/model versions, and honest claims. Lead CTI mapping.
 
-## P6 — Week 11
+## P6 â€” Week 11
 
 Security review of Sentinel itself: authentication, authorization, secrets, API keys, logging, target authorization, input validation, SSRF/unsafe target handling, rate limits, and sensitive finding storage.
 
-## P7 — Week 12
+## P7 â€” Week 12
 
 Final security documentation, security section of paper, demo scenarios, and defense preparation.
 
@@ -459,11 +459,11 @@ Security methodology, ground truth, evidence rules, finding validation, OWASP/CW
 
 ---
 
-# 16. MEMBER 4 — FULL STACK
+# 16. MEMBER 4 â€” FULL STACK
 
 ## Role
 
-**Full Stack — Platform & Integration Lead**
+**Full Stack â€” Platform & Integration Lead**
 
 ## Main Ownership
 
@@ -480,7 +480,7 @@ Security methodology, ground truth, evidence rules, finding validation, OWASP/CW
 - Docker
 - Integration
 
-## P0 — Week 1
+## P0 â€” Week 1
 
 Create backend/frontend/Docker Compose. Set up FastAPI, PostgreSQL, Redis, Celery, Ollama, environment variables, initial tables, health/target/scan APIs, Celery scan task, and local target integration.
 
@@ -490,7 +490,7 @@ Required primitive flow:
 API -> Celery -> AttackRunner -> Target -> Judge -> Finding -> PostgreSQL
 ```
 
-## P1 — Weeks 2–3
+## P1 â€” Weeks 2â€“3
 
 Implement authentication, target CRUD, target validation, Target Adapter API, Generic REST target, Ollama target, scan creation, and scan states:
 
@@ -498,27 +498,27 @@ Implement authentication, target CRUD, target validation, Target Adapter API, Ge
 PENDING -> RUNNING -> COMPLETED / FAILED / CANCELLED
 ```
 
-## P2 — Weeks 3–4
+## P2 â€” Weeks 3â€“4
 
 Implement scan history, attack-attempt API, response storage, judge-verdict storage, finding storage, and basic scan status.
 
-## P3 — Weeks 5–6
+## P3 â€” Weeks 5â€“6
 
 Integrate Judge, Sensor, Controller, second-round execution, and controller-decision storage.
 
-## P4 — Weeks 7–8
+## P4 â€” Weeks 7â€“8
 
 Build Dashboard, Targets, New Scan, Active Scan, Scan History, Findings, Finding Details, Reports, Settings, JWT, and PDF generation.
 
-## P5 — Weeks 9–10
+## P5 â€” Weeks 9â€“10
 
 Build evaluation views for baseline/adaptive results, metrics, comparisons, and experiment metadata.
 
-## P6 — Week 11
+## P6 â€” Week 11
 
 Integration tests, security hardening, Docker hardening, errors, logging, API documentation, and SDD.
 
-## P7 — Week 12
+## P7 â€” Week 12
 
 Final local deployment, final UI, final PDF, demo environment, and final integration.
 
@@ -535,11 +535,11 @@ The source walkthrough estimates about 14 weeks. This repository plan compresses
 | Week | Phase | Main Output |
 |---|---|---|
 | 1 | P0 Foundation | Contracts + infrastructure + first primitive pipeline |
-| 2–3 | P1 Attack Engine + Targets | AttackRunner + target adapters + local LLM/RAG + generic REST |
-| 3–4 | P2 Baseline Judges | B0/B1/B2/B3 + labeled dataset |
-| 5–6 | P3 Adaptive Judge | Sensor + Controller + gating + second round |
-| 7–8 | P4 Product UI | Dashboard + scans + findings + PDF |
-| 9–10 | P5 Evaluation | Frozen test set + experiments + metrics + ablations |
+| 2â€“3 | P1 Attack Engine + Targets | AttackRunner + target adapters + local LLM/RAG + generic REST |
+| 3â€“4 | P2 Baseline Judges | B0/B1/B2/B3 + labeled dataset |
+| 5â€“6 | P3 Adaptive Judge | Sensor + Controller + gating + second round |
+| 7â€“8 | P4 Product UI | Dashboard + scans + findings + PDF |
+| 9â€“10 | P5 Evaluation | Frozen test set + experiments + metrics + ablations |
 | 11 | P6 Hardening | Tests + security review + Docker + SDD |
 | 12 | P7 Final Integration | Final product + results + paper + demo |
 
@@ -549,7 +549,7 @@ Paper/documentation should be written continuously rather than postponed to the 
 
 # 18. Week 1 Daily Plan
 
-## Day 1 — Alignment
+## Day 1 â€” Alignment
 
 Team:
 
@@ -582,7 +582,7 @@ Full Stack:
 - Docker skeleton
 - Backend/frontend skeleton
 
-## Day 2 — Infrastructure
+## Day 2 â€” Infrastructure
 
 Run:
 
@@ -600,7 +600,7 @@ Cyber #1: first probe.
 
 Cyber #2: ground-truth rules.
 
-## Day 3 — Local Target
+## Day 3 â€” Local Target
 
 Build:
 
@@ -612,7 +612,7 @@ Ollama
  + Fake PII
 ```
 
-## Day 4 — Contracts
+## Day 4 â€” Contracts
 
 Finalize and validate:
 
@@ -626,7 +626,7 @@ Report
 
 Create mocks.
 
-## Day 5 — First End-to-End Run
+## Day 5 â€” First End-to-End Run
 
 ```text
 garak
@@ -636,14 +636,14 @@ garak
  -> Database
 ```
 
-## Day 6 — Reading + Labeling
+## Day 6 â€” Reading + Labeling
 
 - Read core papers.
 - Finalize labeling protocol.
 - Test multiple responses.
 - Document integration issues.
 
-## Day 7 — Internal/Advisor Demo
+## Day 7 â€” Internal/Advisor Demo
 
 ```text
 Start Scan
