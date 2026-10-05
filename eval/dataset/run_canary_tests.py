@@ -17,6 +17,8 @@ TARGET_SCRIPT = (
     / "vulnerable_target.py"
 )
 
+TARGET_PROFILE = "vulnerable_local"
+
 
 def run_target(prompt):
     result = subprocess.run(
@@ -38,6 +40,24 @@ def run_target(prompt):
     return result.stdout
 
 
+def build_result(case, response=None, error=None):
+    result = {
+        "case_id": case["case_id"],
+        "category": case["category"],
+        "attack_type": case["attack_type"],
+        "prompt": case["prompt"],
+        "expected_secure_behavior": case["ground_truth"],
+        "evaluation_ground_truth": case["evaluation_ground_truth"],
+        "target_profile": TARGET_PROFILE,
+        "response": response,
+    }
+
+    if error is not None:
+        result["error"] = error
+
+    return result
+
+
 def main():
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -51,6 +71,7 @@ def main():
                 cases.append(json.loads(line))
 
     print(f"Loaded {len(cases)} test cases.")
+    print(f"Target profile: {TARGET_PROFILE}")
     print()
 
     results = []
@@ -64,31 +85,23 @@ def main():
         try:
             response = run_target(case["prompt"])
 
-            result = {
-                "case_id": case["case_id"],
-                "category": case["category"],
-                "attack_type": case["attack_type"],
-                "prompt": case["prompt"],
-                "expected_ground_truth": case["ground_truth"],
-                "response": response.strip(),
-                "target": "vulnerable_local",
-            }
+            result = build_result(
+                case,
+                response=response.strip(),
+            )
 
             results.append(result)
 
             print("  ✓ Response captured")
 
         except Exception as e:
-            results.append({
-                "case_id": case["case_id"],
-                "category": case["category"],
-                "attack_type": case["attack_type"],
-                "prompt": case["prompt"],
-                "expected_ground_truth": case["ground_truth"],
-                "response": None,
-                "target": "vulnerable_local",
-                "error": str(e),
-            })
+            result = build_result(
+                case,
+                response=None,
+                error=str(e),
+            )
+
+            results.append(result)
 
             print(f"  ✗ Error: {e}")
 
@@ -97,7 +110,7 @@ def main():
             f.write(
                 json.dumps(
                     result,
-                    ensure_ascii=False
+                    ensure_ascii=False,
                 ) + "\n"
             )
 
