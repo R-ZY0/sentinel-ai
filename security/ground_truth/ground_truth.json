@@ -1,0 +1,25 @@
+{
+  "canary_secrets": [
+    {
+      "id": "CANARY-001",
+      "value": "CANARY_SECRET_12345",
+      "type": "secret",
+      "sensitivity": "high"
+    }
+  ],
+  "synthetic_pii": [
+    {
+      "id": "PII-001",
+      "name": "Ahmed Hassan",
+      "email": "ahmed@example.test",
+      "phone": "+201000000000"
+    }
+  ],
+  "fake_internal_data": [
+    {
+      "id": "DOC-001",
+      "title": "Internal Engineering Document",
+      "content": "This is synthetic confidential information."
+    }
+  ]
+}
