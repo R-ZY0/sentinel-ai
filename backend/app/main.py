@@ -1,3 +1,7 @@
+from kombu.exceptions import OperationalError
+
+from .scan_tasks import run_scan
+
 from contextlib import asynccontextmanager
 from uuid import UUID
 
@@ -51,15 +55,35 @@ def list_targets(db: Session = Depends(get_db)):
 @app.post(
     "/scans",
     response_model=ScanRead,
-    status_code=status.HTTP_201_CREATED,
+    status_code=status.HTTP_202_ACCEPTED,
 )
 def create_scan(payload: ScanCreate, db: Session = Depends(get_db)):
     if db.get(Target, payload.target_id) is None:
         raise HTTPException(status_code=404, detail="Target not found")
 
-    scan = Scan(target_id=payload.target_id)
+    scan = Scan(target_id=payload.target_id, status="queued")
     db.add(scan)
     db.commit()
+    db.refresh(scan)
+
+    try:
+        run_scan.apply_async(args=[str(scan.id)], retry=False)
+
+    except OperationalError:
+        db.refresh(scan)
+
+        if scan.status == "queued":
+            scan.status = "failed"
+            db.commit()
+
+        raise HTTPException(
+            status_code=503,
+            detail={
+                "message": "Could not confirm scan job submission",
+                "scan_id": str(scan.id),
+            },
+        )
+
     db.refresh(scan)
     return scan
 

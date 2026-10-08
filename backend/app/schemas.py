@@ -35,5 +35,5 @@ class ScanRead(BaseModel):
 
     id: UUID
     target_id: UUID
-    status: Literal["created"]
+    status: Literal["created", "queued", "running", "completed", "failed"]
     created_at: datetime
