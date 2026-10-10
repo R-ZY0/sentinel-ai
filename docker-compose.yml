@@ -1,10 +1,22 @@
 services:
+
+  ollama-init:
+    image: ollama/ollama:latest
+    environment:
+      OLLAMA_HOST: http://ollama:11434
+    command: ["pull", "qwen2.5:0.5b"]
+    depends_on:
+      ollama:
+        condition: service_healthy
+    restart: "no"
   api:
     build:
       context: ./backend
     ports:
       - "127.0.0.1:8000:8000"
     depends_on:
+      redis:
+        condition: service_healthy
       postgres:
         condition: service_healthy
     environment:
@@ -37,12 +49,20 @@ services:
     container_name: sentinel-redis
     ports:
       - "127.0.0.1:${REDIS_PORT}:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
 
   celery:
     build:
       context: ./backend
     command: celery -A app.celery_app:celery_app worker --loglevel=info --concurrency=1
     environment:
+      LOCAL_TARGET_MODE: ${LOCAL_TARGET_MODE:-protected}
+      OLLAMA_BASE_URL: http://ollama:11434
+      OLLAMA_MODEL: qwen2.5:0.5b
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
@@ -52,9 +72,11 @@ services:
       CELERY_RESULT_BACKEND: redis://redis:6379/1
     depends_on:
       redis:
-        condition: service_started
+        condition: service_healthy
       postgres:
         condition: service_healthy
+      ollama-init:
+        condition: service_completed_successfully
 
   ollama:
     image: ollama/ollama:latest
@@ -62,6 +84,13 @@ services:
       - "127.0.0.1:11434:11434"
     volumes:
       - ollama_data:/root/.ollama
+    healthcheck:
+      test: ["CMD", "ollama", "list"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 10s
+
 volumes:
   postgres_data:
   ollama_data:
