@@ -26,3 +26,5 @@ Thumbs.db
 
 # Logs
 *.log
+# Local garak virtual environment
+.venv-garak/

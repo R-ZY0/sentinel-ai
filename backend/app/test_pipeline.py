@@ -2,10 +2,10 @@ import unittest
 from unittest.mock import patch
 from uuid import uuid4
 
-from sqlalchemy import select
+from sqlalchemy import create_engine, select, event
 from sqlalchemy.orm import sessionmaker
 
-from .database import engine
+from .database import Base
 from .local_target import CANARY
 from .models import AttackAttempt, Finding, Response, Scan, Target
 from .scan_tasks import run_scan
@@ -13,7 +13,14 @@ from .scan_tasks import run_scan
 
 class PipelineTests(unittest.TestCase):
     def setUp(self):
-        self.connection = engine.connect()
+        self.engine = create_engine("sqlite:///:memory:")
+
+        @event.listens_for(self.engine, "connect")
+        def enable_foreign_keys(dbapi_connection, connection_record):
+            dbapi_connection.execute("PRAGMA foreign_keys=ON")
+
+        Base.metadata.create_all(self.engine)
+        self.connection = self.engine.connect()
         self.transaction = self.connection.begin()
         self.sessions = sessionmaker(
             bind=self.connection,
@@ -25,6 +32,7 @@ class PipelineTests(unittest.TestCase):
             self.transaction.rollback()
         finally:
             self.connection.close()
+            self.engine.dispose()
 
     def check_pipeline(self, text, expect_finding):
         target_id = uuid4()
@@ -45,10 +53,10 @@ class PipelineTests(unittest.TestCase):
             db.commit()
 
         with (
-            patch("app.scan_tasks.SessionLocal", self.sessions),
-            patch("app.attack_runner.SessionLocal", self.sessions),
+            patch("backend.app.scan_tasks.SessionLocal", self.sessions),
+            patch("backend.app.attack_runner.SessionLocal", self.sessions),
             patch(
-                "app.attack_runner.LocalTarget.respond",
+                "backend.app.attack_runner.LocalTarget.respond",
                 return_value=text,
             ),
         ):
@@ -56,31 +64,44 @@ class PipelineTests(unittest.TestCase):
 
         with self.sessions() as db:
             scan = db.get(Scan, scan_id)
-            attempt = db.scalar(
+            attempts = db.scalars(
                 select(AttackAttempt).where(
                     AttackAttempt.scan_id == scan_id
                 )
-            )
-            response = db.scalar(
-                select(Response).where(
-                    Response.attack_attempt_id == attempt.id
-                )
-            )
-            finding = db.scalar(
-                select(Finding).where(
-                    Finding.response_id == response.id
-                )
-            )
+            ).all()
 
             self.assertEqual(scan.status, "completed")
-            self.assertEqual(attempt.status, "completed")
-            self.assertEqual(response.content, text)
-            self.assertEqual(result["attacks_executed"], 1)
-            self.assertEqual(finding is not None, expect_finding)
+            self.assertEqual(len(attempts), 15)
+            self.assertEqual(result["attacks_executed"], 15)
+            self.assertEqual(len(result["results"]), 15)
 
-            if expect_finding:
-                self.assertEqual(finding.evidence, CANARY)
-                self.assertEqual(finding.status, "confirmed")
+            for attempt in attempts:
+                self.assertEqual(attempt.status, "completed")
+
+                responses = db.scalars(
+                    select(Response).where(
+                        Response.attack_attempt_id == attempt.id
+                    )
+                ).all()
+
+                self.assertEqual(len(responses), 1)
+                response = responses[0]
+                self.assertEqual(response.content, text)
+
+                findings = db.scalars(
+                    select(Finding).where(
+                        Finding.response_id == response.id
+                    )
+                ).all()
+
+                self.assertEqual(
+                    len(findings),
+                    1 if expect_finding else 0
+                )
+
+                if expect_finding:
+                    self.assertEqual(findings[0].evidence, CANARY)
+                    self.assertEqual(findings[0].status, "confirmed")
 
     def test_canary_creates_finding(self):
         self.check_pipeline(f"Internal canary: {CANARY}", True)
