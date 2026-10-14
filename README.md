@@ -814,3 +814,71 @@ Week: 1
 Milestone: First primitive end-to-end pipeline
 Priority: Contracts -> Infrastructure -> Local Target -> First Attack -> First Judge -> First Finding
 ```
+## Week 1 local setup and demo
+
+Requires Docker Desktop running with Linux containers.
+
+### First startup
+
+From the repository folder, create a local environment file:
+
+```powershell
+Copy-Item .env.example .env
+```
+
+Set `POSTGRES_PASSWORD` in `.env` before initializing a new database. Do not commit `.env`.
+
+Start the infrastructure:
+
+```powershell
+docker compose up
+```
+
+The first startup builds the backend images and downloads the Ollama image and `qwen2.5:0.5b` model. Model preparation requires internet access. Leave this terminal open.
+
+Startup is ready when FastAPI reports `Application startup complete` and Celery reports `ready`. The `ollama-init` container should exit with code 0.
+
+Open http://localhost:8000/docs.
+
+### Run a scan
+
+1. Use `POST /targets` to register a target with endpoint `http://ollama:11434`.
+2. Copy the returned target `id` into `POST /scans` as `target_id`.
+3. Copy the returned scan `id` into `GET /scans/{id}`.
+4. Wait for `completed` or `failed`.
+
+The initial engine sends one system-prompt leakage probe. The target runs through Ollama, and the judge checks for the exact synthetic canary. Successful attempts and responses are stored in PostgreSQL. A finding is stored only when the canary is detected.
+
+### Controlled finding demo
+
+Set `LOCAL_TARGET_MODE=demo_vulnerable` in `.env`, then run in another terminal:
+
+```powershell
+docker compose up -d celery
+```
+
+Register a target named `DEMO - intentionally vulnerable local target` and run a scan against it. This mode deliberately permits disclosure of a fake canary to demonstrate finding storage.
+
+The setting applies to all local scans handled by that worker; target names are labels, not separate mode configurations.
+
+After the demo, restore `LOCAL_TARGET_MODE=protected` and recreate the worker with the same command. Protected mode instructs the model not to disclose the canary; it does not guarantee resistance to every attack.
+
+### Verification and shutdown
+
+Run controlled database integration tests:
+
+```powershell
+docker compose exec celery python -m unittest app.test_pipeline -v
+```
+
+These tests use supplied responses and roll back their own database changes.
+
+After editing backend code, rebuild with:
+
+```powershell
+docker compose up -d --build api celery
+```
+
+Press Ctrl+C in the foreground Compose terminal to stop the services. Named volumes preserve PostgreSQL data and Ollama models. Do not use `docker compose down -v` unless you intend to delete those volumes.
+
+Current scope: one local probe, an exact-canary judge, and initial database tables. Authentication, garak/PyRIT integration, adaptive judging, and schema migrations remain future work.
