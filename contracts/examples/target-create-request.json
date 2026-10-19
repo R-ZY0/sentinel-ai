@@ -1,0 +1,4 @@
+{
+  "name": "Local Ollama",
+  "endpoint": "http://ollama:11434/"
+}

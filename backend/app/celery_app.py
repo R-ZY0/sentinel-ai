@@ -1,6 +1,13 @@
 import os
-
+from celery.signals import setup_logging
+from .logging_setup import configure_logging
 from celery import Celery
+
+
+@setup_logging.connect
+def configure_worker_logging(**kwargs):
+    configure_logging()
+
 
 celery_app = Celery(
     "sentinel",

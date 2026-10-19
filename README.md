@@ -188,29 +188,18 @@ Deployment: Docker Compose
 
 ## 10. Repository Structure
 
-```text
 sentinel-ai/
-|
-â”œâ”€â”€ contracts/
-â”‚   â”œâ”€â”€ attack_run.schema.json
-â”‚   â”œâ”€â”€ target_response.schema.json
-â”‚   â”œâ”€â”€ judge_verdict.schema.json
-â”‚   â”œâ”€â”€ finding.schema.json
-â”‚   â””â”€â”€ report.schema.json
-â”œâ”€â”€ attack_engine/
-â”œâ”€â”€ judge/
-â”œâ”€â”€ cyberv_engine/
-â”œâ”€â”€ backend/
-â”œâ”€â”€ frontend/
-â”œâ”€â”€ targets/
-â”œâ”€â”€ eval/
-â”œâ”€â”€ docs/
-â”œâ”€â”€ tests/
-â”œâ”€â”€ .env.example
-â”œâ”€â”€ .gitignore
-â”œâ”€â”€ docker-compose.yml
-â””â”€â”€ README.md
-```
+├── backend/
+├── frontend/
+├── attack_engine/
+├── security_validation/
+├── tests/
+├── contracts/
+│   ├── README.md
+│   └── examples/
+├── docs/
+│   └── integration/
+└── docker-compose.yml
 
 ## 11. Core Contracts
 

@@ -88,6 +88,53 @@ class PipelineTests(unittest.TestCase):
     def test_no_canary_creates_no_finding(self):
         self.check_pipeline("I cannot disclose internal information.", False)
 
+    def test_target_timeout_marks_scan_and_attempt_failed(self):
+        target_id = uuid4()
+        scan_id = uuid4()
+
+        with self.sessions() as db:
+            db.add(Target(
+                id=target_id,
+                name="Controlled timeout fixture",
+                endpoint="http://ollama:11434/",
+            ))
+            db.flush()
+            db.add(Scan(
+                id=scan_id,
+                target_id=target_id,
+                status="queued",
+            ))
+            db.commit()
+
+        with (
+            patch("app.scan_tasks.SessionLocal", self.sessions),
+            patch("app.attack_runner.SessionLocal", self.sessions),
+            patch(
+                "app.attack_runner.LocalTarget.respond",
+                side_effect=TimeoutError("Controlled target timeout"),
+            ),
+            self.assertLogs(level="ERROR"),
+        ):
+            with self.assertRaises(TimeoutError):
+                run_scan.run(str(scan_id))
+
+        with self.sessions() as db:
+            scan = db.get(Scan, scan_id)
+            attempt = db.scalar(
+                select(AttackAttempt).where(
+                    AttackAttempt.scan_id == scan_id
+                )
+            )
+            response = db.scalar(
+                select(Response).where(
+                    Response.attack_attempt_id == attempt.id
+                )
+            )
+
+            self.assertEqual(scan.status, "failed")
+            self.assertEqual(attempt.status, "failed")
+            self.assertIsNone(response)
+
 
 if __name__ == "__main__":
     unittest.main()
