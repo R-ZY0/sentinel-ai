@@ -1,0 +1,27 @@
+name: Week 1 contract regressions
+
+on:
+  push:
+    branches:
+      - integration/week-01
+  pull_request:
+    branches:
+      - release/week-01
+
+jobs:
+  data-contracts:
+    runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: sqlite:///:memory:
+      PYTHONPATH: backend:.
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install contract-test dependencies
+        run: python -m pip install 'SQLAlchemy>=2.0,<2.1'
+      - name: Contract and migration regressions
+        run: python -m unittest discover -s tests -p 'test_week1_persistence.py' -v
+      - name: Finding persistence regressions
+        run: python -m unittest attack_engine.test_finding_repository attack_engine.test_finding_database_integration -v
