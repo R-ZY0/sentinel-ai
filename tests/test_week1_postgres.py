@@ -45,6 +45,8 @@ class TestPostgresWeek1Integration(unittest.TestCase):
             ids = persist_attack_run(
                 db, scan_id=scan.id, attack=attack, finding_evidence="PWNED"
             )
+            saved_scan_id = scan.id
+            saved_target_id = target.id
             db.commit()
 
         with Session(self.engine) as db:
@@ -61,8 +63,8 @@ class TestPostgresWeek1Integration(unittest.TestCase):
             db.delete(finding)
             db.delete(db.get(Response, ids["response_id"]))
             db.delete(db.get(AttackAttempt, ids["attempt_id"]))
-            db.delete(db.get(Scan, scan.id))
-            db.delete(db.get(Target, target.id))
+            db.delete(db.get(Scan, saved_scan_id))
+            db.delete(db.get(Target, saved_target_id))
             db.commit()
 
     def test_idempotent_schema_migration(self):
