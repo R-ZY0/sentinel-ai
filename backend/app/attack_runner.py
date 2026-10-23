@@ -1,11 +1,19 @@
+"""Week-01 local scan runner, using Cyber Attack Library + AI Canary Judge.
+
+The Backend owns persistence. Exactly one approved local probe is used for P0.
+"""
 import logging
 from uuid import UUID
 
+from attack_engine.attack_run import AttackRun
+from judge.canary_judge import CanaryRegexJudge
+from judge.verdict import Verdict
+
 from .attack_engine import AttackEngine
+from .attack_persistence import persist_attack_run
 from .database import SessionLocal
-from .judge import CanaryJudge
-from .local_target import LocalTarget, OLLAMA_BASE_URL
-from .models import AttackAttempt, Finding, Response, Target
+from .local_target import LocalTarget, OLLAMA_BASE_URL, CANARY
+from .models import Target
 
 logger = logging.getLogger(__name__)
 
@@ -16,86 +24,76 @@ class AttackRunner:
             target = db.get(Target, target_id)
             if target is None:
                 raise ValueError("Target not found")
-
             if target.endpoint.rstrip("/") != OLLAMA_BASE_URL:
                 raise ValueError(
-                    "This first runner supports only the configured local Ollama target"
+                    "Week-01 runner supports only the configured local Ollama target"
                 )
+            target_endpoint = target.endpoint
 
         results = []
-
+        detector = CanaryRegexJudge(canaries=[CANARY])
         for probe in AttackEngine().probes():
-            with SessionLocal() as db:
-                attempt = AttackAttempt(
-                    scan_id=scan_id,
-                    category=probe.category,
-                    payload=probe.payload,
-                    status="running",
+            attack = AttackRun(
+                attack_id=probe.attack_case_id,
+                category=probe.category,
+                payload=probe.payload,
+                target=target_endpoint,
+                strategy=probe.strategy,
+                expected_behavior=probe.expected_behavior,
+                status="pending",
+            )
+            try:
+                response_text = LocalTarget().respond(probe.payload)
+                if not isinstance(response_text, str) or not response_text.strip():
+                    raise ValueError("Local target returned an empty response")
+
+                verdict = detector.judge(response_text)
+                leaked = verdict.verdict == Verdict.LEAK
+                attack.actual_response = response_text
+                attack.status = "completed"
+
+                with SessionLocal() as db:
+                    ids = persist_attack_run(
+                        db,
+                        scan_id=scan_id,
+                        attack=attack,
+                        finding_evidence=CANARY if leaked else None,
+                        confirmed=leaked,  # Exact planted local test canary.
+                    )
+                    db.commit()
+
+                logger.info(
+                    "Week-01 probe completed: scan=%s case=%s leaked=%s",
+                    scan_id, probe.attack_case_id, leaked,
                 )
-                db.add(attempt)
-                db.flush()
-                attempt_id = attempt.id
-                db.commit()
-
-                try:
-                    response_text = LocalTarget().respond(probe.payload)
-                    verdict = CanaryJudge().evaluate(response_text)
-
-                    response = Response(
-                        attack_attempt_id=attempt_id,
-                        content=response_text,
-                    )
-                    db.add(response)
-                    db.flush()
-                    response_id = response.id
-
-                    finding_id = None
-                    if verdict.leaked:
-                        finding = Finding(
-                            response_id=response_id,
-                            category=probe.category,
-                            severity="unassessed",
-                            status="confirmed",
-                            evidence=verdict.evidence,
-                        )
-                        db.add(finding)
-                        db.flush()
-                        finding_id = finding.id
-
-                    attempt.status = "completed"
-                    db.commit()
-
-                    logger.info(
-                        "Probe completed: scan=%s attempt=%s leaked=%s",
-                        scan_id,
-                        attempt_id,
-                        verdict.leaked,
-                    )
-
-                    results.append({
-                        "attempt_id": str(attempt_id),
-                        "response_id": str(response_id),
-                        "finding_id": (
-                            str(finding_id) if finding_id else None
-                        ),
-                        "canary_leaked": verdict.leaked,
-                        "judge_reason": verdict.reason,
-                    })
-
-                except Exception:
-                    db.rollback()
-                    attempt = db.get(AttackAttempt, attempt_id)
-                    attempt.status = "failed"
-                    db.commit()
-                    logger.exception(
-                        "Probe failed: scan=%s attempt=%s",
-                        scan_id,
-                        attempt_id,
-                    )
-                    raise
+                results.append({
+                    "attempt_id": str(ids["attempt_id"]),
+                    "response_id": str(ids["response_id"]),
+                    "finding_id": (
+                        str(ids["finding_id"])
+                        if ids["finding_id"] is not None else None
+                    ),
+                    "attack_case_id": ids["attack_case_id"],
+                    "canary_leaked": leaked,
+                    "judge_reason": verdict.reason,
+                })
+            except Exception:
+                logger.exception(
+                    "Week-01 probe failed: scan=%s case=%s",
+                    scan_id, probe.attack_case_id,
+                )
+                # Preserve a failed attempt when target/judge execution failed.
+                # A DB-write failure should bubble up, not create a fake result.
+                if attack.status != "completed":
+                    attack.status = "failed"
+                    attack.actual_response = None
+                    with SessionLocal() as db:
+                        persist_attack_run(db, scan_id=scan_id, attack=attack)
+                        db.commit()
+                raise
 
         return {
-            "mode": "local_test",
+            "mode": "week1_local",
             "scan_id": str(scan_id),
             "attacks_executed": len(results),
             "results": results,
