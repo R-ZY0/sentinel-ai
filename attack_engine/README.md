@@ -55,3 +55,25 @@ Run backend pipeline tests:
 ## Authorized Use
 
 Test only systems you own or have explicit authorization to assess.
+
+## Integration Contract Status
+
+- `AttackRun.attack_id` identifies a predefined attack definition,
+  for example `PI-001`.
+- The current team's `AttackAttempt.id` is the unique database
+  execution-attempt identifier (UUID).
+- The current `backend/app/models.py` does not contain an
+  `AttackAttempt.attack_id` database column.
+- These identifiers must not be treated as interchangeable.
+- Persistence of the attack definition ID across the backend
+  database boundary requires an agreed team contract.
+- Final shared contract approval is pending team review.
+- Full live backend integration is not yet verified.
+
+## Validation Limits
+
+- Component tests are not equivalent to a full Docker-based
+  integration test.
+- Timeout and exception coverage require separate verification
+  against real target failure scenarios.
+- Examples are illustrative, not captured live outputs.

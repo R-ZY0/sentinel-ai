@@ -1,4 +1,4 @@
-﻿import ast
+import ast
 import unittest
 from pathlib import Path
 from uuid import UUID, uuid4
@@ -61,7 +61,8 @@ class TestBackendContract(unittest.TestCase):
 
         self.assertEqual(records.attempt["id"], attempt_id)
         self.assertEqual(records.attempt["scan_id"], scan_id)
-        self.assertEqual(records.attempt["attack_id"], "PI-001")
+        self.assertNotIn("attack_id", records.attempt)
+        self.assertEqual(make_run().attack_id, "PI-001")
         self.assertEqual(
             records.attempt["category"],
             "prompt_injection",
@@ -137,9 +138,9 @@ class TestBackendContract(unittest.TestCase):
         self.assertIn("target_id", scan_fields)
 
         self.assertTrue({
-            "id", "scan_id", "attack_id",
-            "category", "payload", "status",
+            "id", "scan_id", "category", "payload", "status"
         }.issubset(attempt_fields))
+        self.assertNotIn("attack_id", attempt_fields)
 
         self.assertTrue({
             "attack_attempt_id", "content"

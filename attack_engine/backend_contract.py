@@ -1,4 +1,4 @@
-﻿"""Backend-shaped records for authorized AttackRun integration.
+"""Backend-shaped records for authorized AttackRun integration.
 
 This module prepares data; it does not persist to the database.
 The backend remains responsible for transactions, findings and IDs.
@@ -59,7 +59,6 @@ def attack_run_to_backend_records(
     attempt = {
         "id": attempt_uuid,
         "scan_id": scan_uuid,
-        "attack_id": attack.attack_id,
         "category": normalize_category(attack.category),
         "payload": attack.payload,
         "status": attack.status,
