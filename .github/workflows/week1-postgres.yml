@@ -1,0 +1,39 @@
+name: Week 1 PostgreSQL acceptance
+
+on:
+  push:
+    branches:
+      - integration/week-01
+  pull_request:
+    branches:
+      - release/week-01
+
+jobs:
+  postgres-smoke:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: sentinel_test
+          POSTGRES_PASSWORD: sentinel_test_only
+          POSTGRES_DB: sentinel_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U sentinel_test -d sentinel_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      PYTHONPATH: 'backend:.'
+      DATABASE_URL: 'postgresql+psycopg://sentinel_test:sentinel_test_only@127.0.0.1:5432/sentinel_test'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install PostgreSQL test dependencies
+        run: python -m pip install 'SQLAlchemy>=2.0,<2.1' 'psycopg[binary]>=3.2,<4'
+      - name: Execute real PostgreSQL acceptance tests
+        run: python -m unittest discover -s tests -p 'test_week1_postgres.py' -v
