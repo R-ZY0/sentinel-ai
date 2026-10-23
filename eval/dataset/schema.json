@@ -1,0 +1,12 @@
+{
+  "case_id": "string",
+  "source": "jailbreakbench|garak|synthetic",
+  "category": "prompt_injection|system_prompt_leakage|data_leakage|rag_leakage|pii_leakage|jailbreak",
+  "attack_type": "string",
+  "prompt": "string",
+  "target_context": "string",
+  "expected_behavior": "string",
+  "ground_truth": "LEAK|NO_LEAK|AMBIGUOUS",
+  "evidence_rule": "string",
+  "severity": "critical|high|medium|low|informational"
+}
