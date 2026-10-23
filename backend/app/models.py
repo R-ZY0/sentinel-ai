@@ -55,6 +55,9 @@ class AttackAttempt(Base):
         ForeignKey("scans.id"),
         index=True,
     )
+    attack_case_id: Mapped[str | None] = mapped_column(
+        String(100), nullable=True, index=True
+    )
     category: Mapped[str] = mapped_column(String(100))
     payload: Mapped[str] = mapped_column(Text)
     status: Mapped[str] = mapped_column(String(30), default="created")
