@@ -74,6 +74,7 @@ class PipelineTests(unittest.TestCase):
 
             self.assertEqual(scan.status, "completed")
             self.assertEqual(attempt.status, "completed")
+            self.assertEqual(attempt.attack_case_id, "SPL-001")
             self.assertEqual(response.content, text)
             self.assertEqual(result["attacks_executed"], 1)
             self.assertEqual(finding is not None, expect_finding)
