@@ -1,64 +1,31 @@
-import os
+"""Canonical-backend adapter for suspected findings, not a second SQL schema.
 
-import psycopg
-
-from attack_engine.finding import Finding
+The caller must first persist the response and supply its UUID. Session
+transaction ownership stays with the backend (no implicit commits).
+"""
+from sqlalchemy.orm import Session
+from attack_engine.backend_contract import as_uuid, normalize_category
+from attack_engine.finding import Finding as AttackFinding
 
 
 class FindingRepository:
-    def __init__(
-        self,
-        host="localhost",
-        port=5432,
-        dbname="attack_engine",
-        user="postgres",
-    ):
-        password = os.getenv("POSTGRES_PASSWORD")
+    def __init__(self, db: Session, *, response_id):
+        self.db = db
+        self.response_id = as_uuid(response_id, "response_id")
 
-        if not password:
-            raise ValueError(
-                "POSTGRES_PASSWORD environment variable is not set."
-            )
-
-        self.connection_string = (
-            f"host={host} "
-            f"port={port} "
-            f"dbname={dbname} "
-            f"user={user} "
-            f"password={password}"
+    def save(self, finding: AttackFinding):
+        from app.models import Response, Finding
+        if self.db.get(Response, self.response_id) is None:
+            raise ValueError("Response not found")
+        if not isinstance(finding.evidence, str) or not finding.evidence.strip():
+            raise ValueError("Finding evidence must be non-empty")
+        stored = Finding(
+            response_id=self.response_id,
+            category=normalize_category(finding.category),
+            severity="unassessed",
+            status="suspected",
+            evidence=finding.evidence,
         )
-
-    def save(self, finding: Finding):
-        with psycopg.connect(self.connection_string) as connection:
-            with connection.cursor() as cursor:
-                cursor.execute(
-                    """
-                    INSERT INTO findings (
-                        finding_id,
-                        attack_id,
-                        category,
-                        title,
-                        severity,
-                        description,
-                        evidence,
-                        remediation,
-                        timestamp
-                    )
-                    VALUES (
-                        %s, %s, %s, %s, %s, %s, %s, %s, %s
-                    )
-                    """,
-                    (
-                        finding.finding_id,
-                        finding.attack_id,
-                        finding.category,
-                        finding.title,
-                        finding.severity,
-                        finding.description,
-                        finding.evidence,
-                        finding.remediation,
-                        finding.timestamp,
-                    ),
-                )
-
-            connection.commit()
+        self.db.add(stored)
+        self.db.flush()
+        return stored
