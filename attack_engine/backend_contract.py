@@ -50,6 +50,9 @@ def attack_run_to_backend_records(
     if not attack.attack_id or not attack.attack_id.strip():
         raise ValueError("attack_id is required")
 
+    if len(attack.attack_id) > 100:
+        raise ValueError("attack_id exceeds 100 characters")
+
     if not attack.payload or not attack.payload.strip():
         raise ValueError("payload is required")
 
@@ -59,6 +62,7 @@ def attack_run_to_backend_records(
     attempt = {
         "id": attempt_uuid,
         "scan_id": scan_uuid,
+        "attack_case_id": attack.attack_id,
         "category": normalize_category(attack.category),
         "payload": attack.payload,
         "status": attack.status,
