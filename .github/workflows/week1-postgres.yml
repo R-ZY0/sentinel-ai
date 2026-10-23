@@ -27,6 +27,8 @@ jobs:
           --health-retries 10
     env:
       PYTHONPATH: 'backend:.'
+      CELERY_BROKER_URL: 'redis://localhost:6379/0'
+      CELERY_RESULT_BACKEND: 'redis://localhost:6379/1'
       DATABASE_URL: 'postgresql+psycopg://sentinel_test:sentinel_test_only@127.0.0.1:5432/sentinel_test'
     steps:
       - uses: actions/checkout@v4
