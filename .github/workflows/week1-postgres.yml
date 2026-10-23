@@ -34,6 +34,8 @@ jobs:
         with:
           python-version: '3.12'
       - name: Install PostgreSQL test dependencies
-        run: python -m pip install 'SQLAlchemy>=2.0,<2.1' 'psycopg[binary]>=3.2,<4'
+        run: python -m pip install -r backend/requirements.txt
       - name: Execute real PostgreSQL acceptance tests
         run: python -m unittest discover -s tests -p 'test_week1_postgres.py' -v
+      - name: Verify Backend to AI/Cyber pipeline with real Postgres and mocked local target
+        run: python -m unittest app.test_pipeline -v
