@@ -1,0 +1,15 @@
+﻿{
+  "target": "local-test-target",
+  "execution_engine": "pyrit",
+  "attack_library": "ATTACK_LIBRARY",
+  "attack_case_count": 15,
+  "categories": [
+    "Prompt Injection",
+    "System Prompt Leakage",
+    "Data Leakage",
+    "RAG Leakage",
+    "Jailbreak"
+  ],
+  "second_round": false,
+  "note": "Illustrative configuration only. The current implementation does not load this file automatically."
+}
