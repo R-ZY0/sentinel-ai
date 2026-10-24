@@ -1,11 +1,13 @@
-"""Week-01 local scan runner, using Cyber Attack Library + AI Canary Judge.
+"""Local scan pipeline: selected Cyber probes, AI canary judge and Cyber heuristic triage.
 
-The Backend owns persistence. Exactly one approved local probe is used for P0.
+Week-1 single probe remains the default; full 15 probes require opt-in.
+Suspected heuristic violations are not confirmed security findings.
 """
 import logging
 from uuid import UUID
 
 from attack_engine.attack_run import AttackRun
+from attack_engine.basic_judge import BasicJudge
 from judge.canary_judge import CanaryRegexJudge
 from judge.verdict import Verdict
 
@@ -32,7 +34,9 @@ class AttackRunner:
 
         results = []
         detector = CanaryRegexJudge(canaries=[CANARY])
-        for probe in AttackEngine().probes():
+        heuristic = BasicJudge()
+        engine = AttackEngine()
+        for probe in engine.probes():
             attack = AttackRun(
                 attack_id=probe.attack_case_id,
                 category=probe.category,
@@ -52,13 +56,32 @@ class AttackRunner:
                 attack.actual_response = response_text
                 attack.status = "completed"
 
+                if leaked:
+                    # Only a trusted, planted synthetic canary is confirmed.
+                    attack.evaluation_status = "fail"
+                    attack.passed = False
+                    attack.judge_reason = verdict.reason
+                    finding_evidence = CANARY
+                    confirmed = True
+                else:
+                    # BasicJudge is heuristic: its failures are suspected only.
+                    status, reason, passed = heuristic.evaluate(attack)
+                    attack.evaluation_status = status
+                    attack.passed = passed
+                    attack.judge_reason = reason
+                    finding_evidence = (
+                        f"Heuristic indicator for {probe.attack_case_id}: {reason}"
+                        if status == "fail" else None
+                    )
+                    confirmed = False
+
                 with SessionLocal() as db:
                     ids = persist_attack_run(
                         db,
                         scan_id=scan_id,
                         attack=attack,
-                        finding_evidence=CANARY if leaked else None,
-                        confirmed=leaked,  # Exact planted local test canary.
+                        finding_evidence=finding_evidence,
+                        confirmed=confirmed,
                     )
                     db.commit()
 
@@ -75,7 +98,13 @@ class AttackRunner:
                     ),
                     "attack_case_id": ids["attack_case_id"],
                     "canary_leaked": leaked,
-                    "judge_reason": verdict.reason,
+                    "evaluation_status": attack.evaluation_status,
+                    "finding_status": (
+                        "confirmed" if leaked
+                        else "suspected" if finding_evidence is not None
+                        else None
+                    ),
+                    "judge_reason": attack.judge_reason,
                 })
             except Exception:
                 logger.exception(
@@ -93,7 +122,7 @@ class AttackRunner:
                 raise
 
         return {
-            "mode": "week1_local",
+            "mode": engine.profile,
             "scan_id": str(scan_id),
             "attacks_executed": len(results),
             "results": results,
