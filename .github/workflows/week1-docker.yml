@@ -1,0 +1,32 @@
+name: Week 1 container build
+
+on:
+  push:
+    branches:
+      - integration/week-01
+  pull_request:
+    branches:
+      - release/week-01
+
+jobs:
+  docker-build:
+    runs-on: ubuntu-latest
+    env:
+      POSTGRES_DB: sentinel_ci
+      POSTGRES_USER: sentinel_ci
+      POSTGRES_PASSWORD: sentinel_ci_only
+      POSTGRES_PORT: '15432'
+      REDIS_PORT: '16379'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate Docker Compose configuration
+        run: docker compose config -q
+      - name: Build API and Celery images
+        run: docker compose build api celery
+      - name: Verify Cyber and AI module imports inside API image
+        run: >-
+          docker compose run --no-deps --rm
+          -e DATABASE_URL=sqlite:///:memory:
+          -e CELERY_BROKER_URL=redis://localhost:6379/0
+          -e CELERY_RESULT_BACKEND=redis://localhost:6379/1
+          api python -c "from app.attack_runner import AttackRunner; from app.attack_engine import AttackEngine; from judge.canary_judge import CanaryRegexJudge; assert AttackEngine().probes()[0].attack_case_id == 'SPL-001'; print('Week1 container module import: PASS')"

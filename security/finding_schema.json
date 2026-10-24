@@ -1,0 +1,213 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Sentinel AI Finding",
+  "description": "Normalized security finding produced by Sentinel AI after analyzing an authorized AI target.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "finding_id",
+    "scan_id",
+    "test_case_id",
+    "title",
+    "status",
+    "category",
+    "confidence",
+    "evidence",
+    "classification",
+    "severity"
+  ],
+  "properties": {
+    "finding_id": {
+      "type": "string"
+    },
+    "scan_id": {
+      "type": "string"
+    },
+    "test_case_id": {
+      "type": "string",
+      "pattern": "^TC-[0-9]{3}$"
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "description": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "potential",
+        "confirmed",
+        "rejected"
+      ]
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "prompt_injection",
+        "system_prompt_leakage",
+        "data_leakage",
+        "rag_leakage",
+        "pii_leakage",
+        "jailbreak"
+      ]
+    },
+    "confidence": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "evidence": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "type",
+          "description",
+          "validated"
+        ],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "leakage",
+              "refusal",
+              "retest",
+              "response",
+              "trajectory"
+            ]
+          },
+          "description": {
+            "type": "string"
+          },
+          "attempt_id": {
+            "type": "string"
+          },
+          "snippet": {
+            "type": "string"
+          },
+          "validated": {
+            "type": "boolean"
+          }
+        }
+      }
+    },
+    "classification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "owasp",
+        "cwe"
+      ],
+      "properties": {
+        "owasp": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "name"
+            ],
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "role": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "cwe": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "name"
+            ],
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "role": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "severity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "cvss_version",
+        "score",
+        "rating",
+        "vector"
+      ],
+      "properties": {
+        "cvss_version": {
+          "type": "string",
+          "const": "4.0"
+        },
+        "score": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 10
+        },
+        "rating": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "enum": [
+            "NONE",
+            "LOW",
+            "MEDIUM",
+            "HIGH",
+            "CRITICAL",
+            null
+          ]
+        },
+        "vector": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "assessment_status": {
+          "type": "string",
+          "enum": [
+            "pending",
+            "assessed"
+          ]
+        }
+      }
+    },
+    "remediation": {
+      "type": "string"
+    },
+    "references": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "format": "uri"
+      }
+    }
+  }
+}

@@ -1,0 +1,91 @@
+{
+  "taxonomy": {
+    "name": "Common Weakness Enumeration",
+    "version": "4.20",
+    "source": "MITRE CWE",
+    "source_url": "https://cwe.mitre.org/"
+  },
+  "mappings": [
+    {
+      "test_case_id": "TC-001",
+      "title": "System Prompt Leakage",
+      "cwe": [
+        {
+          "id": "CWE-200",
+          "name": "Exposure of Sensitive Information to an Unauthorized Actor",
+          "role": "primary"
+        }
+      ],
+      "mapping_type": "impact",
+      "rationale": "The test evaluates unauthorized disclosure of protected system instructions. CWE-200 describes exposure of sensitive information to an unauthorized actor.",
+      "source_url": "https://cwe.mitre.org/data/definitions/200.html",
+      "notes": "CWE-200 describes the information-disclosure impact. It does not by itself identify the specific root cause of system prompt leakage."
+    },
+    {
+      "test_case_id": "TC-002",
+      "title": "Canary Secret Leakage",
+      "cwe": [
+        {
+          "id": "CWE-200",
+          "name": "Exposure of Sensitive Information to an Unauthorized Actor",
+          "role": "primary"
+        }
+      ],
+      "mapping_type": "impact",
+      "rationale": "The test evaluates whether a protected synthetic secret is disclosed to an unauthorized requester. This corresponds to exposure of sensitive information to an unauthorized actor.",
+      "source_url": "https://cwe.mitre.org/data/definitions/200.html"
+    },
+    {
+      "test_case_id": "TC-003",
+      "title": "RAG Document Leakage",
+      "cwe": [
+        {
+          "id": "CWE-200",
+          "name": "Exposure of Sensitive Information to an Unauthorized Actor",
+          "role": "primary"
+        }
+      ],
+      "mapping_type": "impact",
+      "rationale": "The test evaluates unauthorized disclosure of confidential information contained in a protected RAG document. CWE-200 captures the information-disclosure impact.",
+      "source_url": "https://cwe.mitre.org/data/definitions/200.html",
+      "notes": "CWE-200 is used for the observed disclosure impact. A more specific root-cause weakness should only be added if the implementation demonstrates one."
+    },
+    {
+      "test_case_id": "TC-004",
+      "title": "Synthetic PII Leakage",
+      "cwe": [
+        {
+          "id": "CWE-359",
+          "name": "Exposure of Private Personal Information to an Unauthorized Actor",
+          "role": "primary"
+        }
+      ],
+      "mapping_type": "impact",
+      "rationale": "The test evaluates unauthorized disclosure of personally identifiable information. CWE-359 specifically addresses exposure of private personal information to an unauthorized actor.",
+      "source_url": "https://cwe.mitre.org/data/definitions/359.html"
+    },
+    {
+      "test_case_id": "TC-005",
+      "title": "Prompt Injection to Leakage",
+      "cwe": [
+        {
+          "id": "CWE-1427",
+          "name": "Improper Neutralization of Input Used for LLM Prompting",
+          "role": "root_cause_candidate"
+        },
+        {
+          "id": "CWE-200",
+          "name": "Exposure of Sensitive Information to an Unauthorized Actor",
+          "role": "impact"
+        }
+      ],
+      "mapping_type": "compound",
+      "rationale": "The test combines a prompt-manipulation attack with attempted disclosure of protected information. CWE-1427 is relevant to improper neutralization of input used for LLM prompting, while CWE-200 captures the resulting information-disclosure impact.",
+      "source_urls": [
+        "https://cwe.mitre.org/data/definitions/1427.html",
+        "https://cwe.mitre.org/data/definitions/200.html"
+      ],
+      "notes": "CWE-1427 is a root-cause candidate rather than an automatic mapping for every prompt-injection scenario. The final root-cause CWE should be confirmed from the target implementation."
+    }
+  ]
+}

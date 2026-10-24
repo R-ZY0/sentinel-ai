@@ -1,0 +1,39 @@
+name: Week 1 contract regressions
+
+on:
+  push:
+    branches:
+      - integration/week-01
+  pull_request:
+    branches:
+      - release/week-01
+
+jobs:
+  data-contracts:
+    runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: 'sqlite:///:memory:'
+      PYTHONPATH: backend:.
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install contract-test dependencies
+        run: python -m pip install 'SQLAlchemy>=2.0,<2.1'
+      - name: Contract and migration regressions
+        run: python -m unittest discover -s tests -p 'test_week1_persistence.py' -v
+      - name: Attack Engine full-scan selection regressions
+        run: python -m unittest -v attack_engine.test_full_scan_selection
+      - name: Heuristic judge evidence-calibration regressions
+        run: python -m unittest attack_engine.test_basic_judge -v
+      - name: Canary evidence regression tests
+        run: python -m unittest discover -s tests -p test_canary_evidence_regression.py -v
+      - name: Garak protected target regression tests
+        run: python -m unittest -v attack_engine.test_garak_protected_target attack_engine.test_garak_runner
+      - name: JailbreakBench dataset validation contract tests
+        run: python -m unittest discover -s tests -p test_jailbreakbench_dataset.py -v
+      - name: Backend to Hybrid Judge saved-evidence contract tests
+        run: python -m unittest -v judge.integration.test_scan_review
+      - name: Finding persistence regressions
+        run: python -m unittest attack_engine.test_finding_repository attack_engine.test_finding_database_integration -v

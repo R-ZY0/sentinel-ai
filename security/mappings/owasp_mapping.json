@@ -1,0 +1,78 @@
+{
+  "taxonomy": {
+    "name": "OWASP Top 10 for LLM Applications and Generative AI",
+    "version": "2025",
+    "source": "OWASP Gen AI Security Project",
+    "source_url": "https://genai.owasp.org/llm-top-10/"
+  },
+  "mappings": [
+    {
+      "test_case_id": "TC-001",
+      "title": "System Prompt Leakage",
+      "owasp": {
+        "id": "LLM07:2025",
+        "name": "System Prompt Leakage"
+      },
+      "mapping_type": "direct",
+      "rationale": "The test case specifically evaluates whether the target reveals protected system instructions or system prompt content. OWASP explicitly defines LLM07 as System Prompt Leakage.",
+      "source_url": "https://genai.owasp.org/llmrisk/llm072025-system-prompt-leakage/"
+    },
+    {
+      "test_case_id": "TC-002",
+      "title": "Canary Secret Leakage",
+      "owasp": {
+        "id": "LLM02:2025",
+        "name": "Sensitive Information Disclosure"
+      },
+      "mapping_type": "direct",
+      "rationale": "The test evaluates unauthorized disclosure of a synthetic secret. OWASP LLM02 covers sensitive information disclosure, including security credentials and confidential information.",
+      "source_url": "https://genai.owasp.org/llmrisk/llm022025-sensitive-information-disclosure/"
+    },
+    {
+      "test_case_id": "TC-003",
+      "title": "RAG Document Leakage",
+      "owasp": {
+        "id": "LLM02:2025",
+        "name": "Sensitive Information Disclosure"
+      },
+      "mapping_type": "primary",
+      "rationale": "The test evaluates whether confidential information contained in application context is disclosed to an unauthorized requester. OWASP LLM02 explicitly covers disclosure of confidential business data and sensitive information.",
+      "source_url": "https://genai.owasp.org/llmrisk/llm022025-sensitive-information-disclosure/",
+      "notes": "LLM08:2025 is not assigned automatically. It should only be mapped when the root cause involves a vector or embedding weakness rather than simple unauthorized disclosure."
+    },
+    {
+      "test_case_id": "TC-004",
+      "title": "Synthetic PII Leakage",
+      "owasp": {
+        "id": "LLM02:2025",
+        "name": "Sensitive Information Disclosure"
+      },
+      "mapping_type": "direct",
+      "rationale": "The test evaluates unauthorized disclosure of personally identifiable information. OWASP explicitly lists PII Leakage as an example of Sensitive Information Disclosure.",
+      "source_url": "https://genai.owasp.org/llmrisk/llm022025-sensitive-information-disclosure/"
+    },
+    {
+      "test_case_id": "TC-005",
+      "title": "Prompt Injection to Leakage",
+      "owasp": [
+        {
+          "id": "LLM01:2025",
+          "name": "Prompt Injection",
+          "role": "attack_vector"
+        },
+        {
+          "id": "LLM02:2025",
+          "name": "Sensitive Information Disclosure",
+          "role": "impact"
+        }
+      ],
+      "mapping_type": "compound",
+      "rationale": "The test uses a prompt injection to attempt to cause unauthorized disclosure. OWASP describes Prompt Injection as a vulnerability that can result in disclosure of sensitive information, while LLM02 describes the resulting sensitive information disclosure.",
+      "source_urls": [
+        "https://genai.owasp.org/llmrisk/llm01-prompt-injection/",
+        "https://genai.owasp.org/llmrisk/llm022025-sensitive-information-disclosure/"
+      ],
+      "notes": "LLM01 represents the attack mechanism and LLM02 represents the resulting information-disclosure impact."
+    }
+  ]
+}

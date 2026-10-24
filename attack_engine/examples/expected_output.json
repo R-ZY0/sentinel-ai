@@ -1,0 +1,13 @@
+﻿{
+  "status": "illustrative_example",
+  "execution_completed": false,
+  "attack_case_count": 15,
+  "evaluation_statuses": [
+    "pass",
+    "fail",
+    "not_evaluated",
+    "pending"
+  ],
+  "security_findings": [],
+  "note": "This is a schema illustration, not actual test output. Findings and evaluation results depend on executing attacks against the configured target."
+}
