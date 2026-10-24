@@ -25,5 +25,9 @@ jobs:
         run: python -m unittest discover -s tests -p 'test_week1_persistence.py' -v
       - name: Canary evidence regression tests
         run: python -m unittest discover -s tests -p test_canary_evidence_regression.py -v
+      - name: Garak protected target regression tests
+        run: python -m unittest -v attack_engine.test_garak_protected_target attack_engine.test_garak_runner
+      - name: JailbreakBench dataset validation contract tests
+        run: python -m unittest discover -s tests -p test_jailbreakbench_dataset.py -v
       - name: Finding persistence regressions
         run: python -m unittest attack_engine.test_finding_repository attack_engine.test_finding_database_integration -v
