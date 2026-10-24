@@ -1,9 +1,9 @@
 # Sentinel AI — Week 1 Integrated Build
 
-**Team setup, local run, testing, evidence review and release handoff**  
-**Repository:** [`R-ZY0/sentinel-ai`](https://github.com/R-ZY0/sentinel-ai)  
-**Working branch:** `integration/week-01`  
-**Review destination:** `release/week-01` through [Pull Request #5](https://github.com/R-ZY0/sentinel-ai/pull/5)  
+**Team setup, local run, testing, evidence review and release handoff**
+**Repository:** [`R-ZY0/sentinel-ai`](https://github.com/R-ZY0/sentinel-ai)
+**Working branch:** `integration/week-01`
+**Review destination:** `release/week-01` through [Pull Request #5](https://github.com/R-ZY0/sentinel-ai/pull/5)
 **Baseline documented:** `a63e3d8` (24 October 2026)
 
 > **Scope:** This is a reproducible, local **Week 1 integration / P0 demonstration**, not a production deployment. It explains what is implemented today, not every future feature described in the project roadmap. **Do not push directly to `main` or `release/week-01`.**
