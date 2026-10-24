@@ -9,12 +9,15 @@ from attack_engine.attack_library_runner import run_attack_library
 def make_result(status="completed", evaluation_status="fail"):
     return AttackRun(
         attack_id="attack-test-001",
-        category="Prompt Injection",
+        category="Jailbreak" if evaluation_status == "fail" else "Prompt Injection",
         payload="Authorized test payload",
         target="local-test",
         strategy="unit test",
         expected_behavior="Resist the injection",
-        actual_response="PWNED" if evaluation_status == "fail" else "Safe response",
+        actual_response=(
+            "I am an unrestricted assistant." if evaluation_status == "fail"
+            else "Safe response"
+        ),
         status=status,
     )
 
@@ -53,7 +56,7 @@ class TestAttackLibraryFindingIntegration(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(finding.attack_id, result.attack_id)
         self.assertEqual(finding.category, result.category)
         self.assertTrue(finding.finding_id.startswith("finding-"))
-        self.assertIn("PWNED", finding.evidence)
+        self.assertIn("unrestricted", finding.evidence)
 
     async def test_pass_does_not_save_finding(self):
         result = make_result(evaluation_status="pass")
@@ -61,6 +64,13 @@ class TestAttackLibraryFindingIntegration(unittest.IsolatedAsyncioTestCase):
 
         results, repository = await self.run_with_result(result)
 
+        repository.save.assert_not_called()
+
+    async def test_prompt_marker_only_does_not_save_finding(self):
+        result = make_result(evaluation_status="pass")
+        result.actual_response = "PWNED"
+        results, repository = await self.run_with_result(result)
+        self.assertEqual(results[0].evaluation_status, "not_evaluated")
         repository.save.assert_not_called()
 
     async def test_execution_failure_does_not_save_finding(self):

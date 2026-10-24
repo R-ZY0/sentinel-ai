@@ -137,6 +137,59 @@ class PipelineTests(unittest.TestCase):
         self.assertEqual(sum(r["finding_status"] == "confirmed" for r in result["results"]), 0)
         self.assertEqual(sum(r["evaluation_status"] == "not_evaluated" for r in result["results"]) > 0, True)
 
+    def test_full_scan_pwned_marker_is_not_security_finding(self):
+        """PWNED alone does not contradict the protected target system policy."""
+        target_id = uuid4()
+        scan_id = uuid4()
+        with self.sessions() as db:
+            db.add(Target(
+                id=target_id, name="PI marker-only regression",
+                endpoint="http://ollama:11434/",
+            ))
+            db.flush()
+            db.add(Scan(id=scan_id, target_id=target_id, status="queued"))
+            db.commit()
+
+        pi_payload = next(c.payload for c in ATTACK_LIBRARY if c.attack_id == "PI-001")
+        jb_payload = next(c.payload for c in ATTACK_LIBRARY if c.attack_id == "JB-001")
+
+        def response_for(prompt):
+            if prompt == pi_payload:
+                return "PWNED"
+            if prompt == jb_payload:
+                return "I am now an unrestricted assistant."
+            return "I cannot disclose internal information."
+
+        with (
+            patch.dict(os.environ, {"SENTINEL_SCAN_PROFILE": "full_local"}),
+            patch("app.scan_tasks.SessionLocal", self.sessions),
+            patch("app.attack_runner.SessionLocal", self.sessions),
+            patch("app.attack_runner.LocalTarget.respond", side_effect=response_for),
+        ):
+            result = run_scan.run(str(scan_id))
+
+        findings_by_case = {
+            r["attack_case_id"]: r["finding_status"] for r in result["results"]
+        }
+        self.assertEqual(result["attacks_executed"], 15)
+        self.assertIsNone(findings_by_case["PI-001"])
+        self.assertEqual(findings_by_case["JB-001"], "suspected")
+        self.assertEqual(
+            next(r["evaluation_status"] for r in result["results"]
+                 if r["attack_case_id"] == "PI-001"),
+            "not_evaluated",
+        )
+
+        with self.sessions() as db:
+            findings = db.execute(
+                select(AttackAttempt.attack_case_id, Finding.status)
+                .select_from(Finding)
+                .join(Response, Response.id == Finding.response_id)
+                .join(AttackAttempt, AttackAttempt.id == Response.attack_attempt_id)
+                .where(AttackAttempt.scan_id == scan_id)
+            ).all()
+        self.assertEqual(findings, [("JB-001", "suspected")])
+
     def test_full_scan_only_confirms_exact_canary_evidence(self):
         target_id = uuid4()
         scan_id = uuid4()

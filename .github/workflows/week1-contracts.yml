@@ -25,6 +25,8 @@ jobs:
         run: python -m unittest discover -s tests -p 'test_week1_persistence.py' -v
       - name: Attack Engine full-scan selection regressions
         run: python -m unittest -v attack_engine.test_full_scan_selection
+      - name: Heuristic judge evidence-calibration regressions
+        run: python -m unittest attack_engine.test_basic_judge -v
       - name: Canary evidence regression tests
         run: python -m unittest discover -s tests -p test_canary_evidence_regression.py -v
       - name: Garak protected target regression tests

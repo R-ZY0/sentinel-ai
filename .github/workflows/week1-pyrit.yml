@@ -22,3 +22,5 @@ jobs:
         run: python -m pip install 'pyrit==1.1.0'
       - name: Protected PyRIT regression tests
         run: python -m unittest -v attack_engine.test_run_pyrit_local attack_engine.test_pyrit_runner_errors attack_engine.test_pyrit_adapter
+      - name: Attack library finding regressions
+        run: python -m unittest -v attack_engine.test_attack_library_runner
