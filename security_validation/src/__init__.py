@@ -5,4 +5,4 @@ from .pipeline import validate_backend_execution
 from .traceability import validate_and_attest_backend_execution
 from .triage import triage_finding
 
-__all__ = ["validate_response", "build_finding", "validate_backend_execution", "validate_and_attest_backend_execution"]
+__all__ = ["validate_response", "build_finding", "validate_backend_execution", "validate_and_attest_backend_execution", "triage_finding"]
