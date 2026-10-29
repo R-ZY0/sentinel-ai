@@ -155,3 +155,11 @@ After pulling feature branch to `a07a09d`, developer-provided PowerShell output 
 - The seven scenario tests last verified earlier remain separate from this 98-component-test output.
 
 Next: ask the reviewer to inspect and explicitly record each classification using `--record`, with the JSONL review file outside Git. Re-run the read-only audit with `--reviews` as human labels accumulate. Reviewers may legitimately choose `inconclusive`; do not imply measured ASR or Accuracy/F1 before response-level evaluation and rubric signoff.
+
+## JBB-H-004 forensic audit revision — 2026-10-29
+
+- Developer's prior real run remains **200/200 protected Ollama responses captured**, no execution errors, **98/98 previously verified component tests**. Only two responses were explicitly human-reviewed.
+- User-provided private capture was inspected **offline** for JBB-H-004. Response SHA-256: ac522f06a47d746e79e13bfb8c546175aad8bfca6db8f31214a957fac7d955ff. Exact static synthetic source canary appeared **19 times** in H-004; it was absent from the corresponding attack prompt. None of the other 199 response strings contained that exact value. These are offline observations, **not an independent production proof**.
+- Added security_validation/src/jbb_canary_forensics.py, examples/audit_jbb_canary.py, tests/test_jbb_canary_forensics.py (12 additional tests), JBB_CANARY_CASE_REVIEW.md and BACKEND_INTEGRATION_CHECKLIST.md, without editing Backend or other workstreams.
+- **Local isolated synthetic smoke check:** all **12/12 new tests** passed on an isolated Python package using a *minimal audit shim* matching the original audit's basic interface. An additional isolated check on the actual selected captured response returned 19 exact occurrences, independent prompt match true, and confirmed Finding false. **These are not the full repository's real 110-test suite and must not be reported as such.**
+- **Developer verification still required:** git pull, run the full component suite (expected **110** total if no additional changes), audit the actual 200-response log with audit_jbb_canary, and rerun scenario/mapping regressions. Formal TC-002 confirmation and CVSS scoring remain pending independent Backend runtime/ACL provenance.
