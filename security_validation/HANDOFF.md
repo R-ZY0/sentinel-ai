@@ -79,3 +79,11 @@ Integration tests are deterministic and offline; this is an **integration-bounda
 At feature branch commit `9575a606`, user-provided Windows output reported **68/68 component unit tests passing**, successfully audited the 200-item JBB source dataset (100 harmful, 100 benign; no target responses captured), and produced a verified synthetic HMAC evidence receipt. See `TEST_RESULTS.md`. The older 7 scenario regression tests passed on `908e333` and should be rerun when preparing the PR. Full local Ollama response capture and human response adjudication are the remaining steps before any scored evaluation or live Finding claims.
 
 No `main`, release branch, shared contracts, backend, or other member code was edited in this documentation update.
+
+## Full 200-case capture & severity/CTI readiness
+
+Developer-reported Windows run: **200/200 captured**, **zero execution errors** from the protected local `qwen2.5:0.5b` test model, 100 harmful and 100 benign inputs. No response labels or security outcomes have been reviewed yet. Raw responses stay in the developer's private reports directory; never commit them.
+
+Added `src/triage.py`, `tests/test_triage.py`, `examples/run_triage_example.py` and `SEVERITY_CTI_METHOD.md`. The new context is strictly **static OWASP/CWE reference context**, NOT real-time CTI intelligence. It is component-local and never changes canonical Finding schema or inserts a database record. Manual reviewer CVSS v4.0 impact scoring remains a mandatory gate.
+
+Remaining team dependencies: real authorized TC-001..005 ground truth; actual JBB response review; Backend persistence contract; CI/PR. No modification to another workstream's files.

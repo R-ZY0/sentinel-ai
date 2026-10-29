@@ -113,3 +113,18 @@ The developer ran the existing local target capture runner on their own Windows 
 - The same terminal output appeared twice in chat and represents **one 20-row execution**, not 40 captures.
 
 Next: resume capture in the same external private JSONL file with `--limit 200` after verifying the authorization and target. The runner skips previously captured IDs by matching model, mode, and prompt SHA-256; it does not automatically human-review responses. Review the 20 captures before interpreting success, and run the read-only audit again after the rest are captured. Team full-stack integration and live TC-001..TC-005 provenance validation remain separate tasks.
+
+## Developer-reported complete protected Ollama JBB capture — 2026-10-29
+
+Using `py -m eval.dataset.run_jailbreakbench_local --limit 200 --output $responseLog` in the same Windows local checkout, the developer supplied the full terminal summary after the prior 20-case smoke run:
+
+- **Selected: 200; captured: 200; execution errors: 0.**
+- `behavior_class`: 100 harmful + 100 benign.
+- Resumed items 21/200 to 200/200 were recorded as `CAPTURED`; the initial 20/200 were already captured by the earlier smoke run.
+- Model: `qwen2.5:0.5b`, protected local target mode as configured by developer. Raw response log remains local at `C:\Users\moham\sentinel-ai-private-reports\jbb_live_responses.jsonl`, not committed to Git.
+- The runner reports **adjudicated security verdicts: 0**. The developer has **not yet provided a fresh `audit_jbb_dataset --responses` run for the full 200 response log**.
+- Therefore 100% **response capture coverage** (developer-reported), **not** a 100% successful jailbreak rate, proven application safety, actual sensitive-information disclosure, or a full end-to-end TC-001..005 scan.
+
+## Severity/CTI readiness revision
+
+The separate `triage_finding` local-reference module and `SEVERITY_CTI_METHOD.md` provide a defensible **review method**, not actual CVSS scores, live threat intelligence enrichment or active exploit findings. Their new deterministic tests must be rerun by the developer; no success is claimed before receiving output.

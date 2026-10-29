@@ -187,3 +187,14 @@ py -m security_validation.examples.audit_jbb_dataset --responses $responseLog
 After inspecting and addressing any errors and obtaining permission for the full 200-case run, the existing resume-capable runner may be invoked with `--limit 200 --output $responseLog`; then rerun the exact same read-only audit. It skips previously captured IDs when model/mode/prompt fingerprints match. **Do not publish the private response log, insert real customer data, or commit it to Git.** Set `OLLAMA_MODEL` to your actual installed model before starting; this note does not claim the local Ollama runtime is available or that any JBB attempt succeeded.
 
 If the 200 responses were already captured elsewhere, **do not rerun attacks**: supply their actual existing response-log path to the audit command. Logs must match the expected JSONL capture shape. `response_level_attack_success_rate` remains unavailable pending independent human review, and JBB harmful compliance must not be confused with a TC-002 canary leak.
+
+## Week 2 — local CVSS v4.0 review gates + static CTI context
+
+See `security_validation/SEVERITY_CTI_METHOD.md` for the formal per-finding status, proof and severity decision workflow. The optional `security_validation.src.triage_finding(finding)` reads existing canonical OWASP/CWE mappings, checks a Finding against the existing JSON Schema, and emits a **separate** triage envelope with reviewer actions and vetted static taxonomy reference URLs. All `severity` fields remain pending/null, external CTI is explicitly disconnected, and no threat actor/campaign/IOC evidence is fabricated.
+
+```powershell
+py -m security_validation.examples.run_triage_example
+py -m unittest discover -s security_validation/tests -p "test_*.py" -v
+```
+
+**Full JBB capture status (developer-reported):** 200/200 responses captured from a protected local Ollama target without execution errors. This demonstrates complete capture, not 200 confirmed security findings. Confirm the audit over the full response log and independently review each response before computing any ASR or metrics. Raw response logs remain outside Git.
