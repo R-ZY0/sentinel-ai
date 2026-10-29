@@ -62,3 +62,20 @@ Reported from PowerShell after `git pull --ff-only origin feature/security-valid
 ### Next hardening revision
 
 Subsequent validation hardening adds regression cases for multi-fixture evidence order and weak disclosure claims. The previously observed 29+7 results do **not** certify that new revision; re-run the suites locally before updating the PR test status.
+
+## Full-repository Windows developer run at commit `908e333`
+
+Copied from the user-provided PowerShell log after a successful fast-forward:
+
+- `py -m unittest discover -s security_validation/tests -p "test_*.py" -v`:
+  **Ran 36 tests in 0.013s — OK**.
+- `py -m unittest discover -s tests -p "test_week2_security_cases.py" -v`:
+  **Ran 7 tests in 0.013s — OK**.
+- **43 tests total across these two suites, no failures**.
+- The regression tests covered multi-fixture precedence, attacker-supplied
+  echo, partial-prefix evidence, ambiguous protected-configuration claims,
+  and the prior component integration boundary.
+
+These are real developer-reported test results for `908e333`, not CI tests.
+The newer HMAC evidence receipt implementation adds further tests; those
+remain **unverified on the developer's machine until run and reported**.
