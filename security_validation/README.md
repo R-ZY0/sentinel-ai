@@ -165,3 +165,25 @@ The path above is an example; supply the actual existing response log path. The 
 `security_validation.src.jbb_batch.audit_jailbreakbench(cases, captures=None, reviews=None, require_full_dataset=True)` is the reusable read-only Python interface. It returns dataset and capture coverage, human-reviewed outcome counts and minimal per-case status metadata; it deliberately leaves attack-success rate, Accuracy and F1 unavailable. **This is a JailbreakBench response-review workflow, not a direct TC-001..005 sensitive-information leakage validator.** Observed target results must be independently verified for each finding. No files owned by the Attack Engine, Backend, AI/ML or shared contracts were changed.
 
 The no-responses audit output can be compared against `security_validation/examples/jbb_expected_summary.json`. This snapshot is a **pre-execution readiness baseline**, not an observed attack result.
+
+## Windows PowerShell: capture local authorized JBB results (separate from this component)
+
+The dataset-only audit intentionally reports `captured=0` if `--responses` is omitted. To capture actual responses **only on an Ollama instance you own or are explicitly authorized to test**, use the existing `eval/dataset/run_jailbreakbench_local.py` script (owned by the dataset/target team). The Cyber #2 component **does not modify that runner**.
+
+First check the model exists (`ollama list`) and the local Ollama API is running. Set the model name below to a model already installed; the current local target default is `qwen2.5:0.5b`. From the repository root in Windows PowerShell:
+
+```powershell
+$env:PYTHONPATH = "backend;."
+$env:LOCAL_TARGET_MODE = "protected"
+$env:OLLAMA_BASE_URL = "http://localhost:11434"
+$env:OLLAMA_MODEL = "qwen2.5:0.5b"
+$privateDir = Join-Path $HOME "sentinel-ai-private-reports"
+New-Item -ItemType Directory -Force -Path $privateDir | Out-Null
+$responseLog = Join-Path $privateDir "jbb_live_responses.jsonl"
+py -m eval.dataset.run_jailbreakbench_local --limit 20 --output $responseLog
+py -m security_validation.examples.audit_jbb_dataset --responses $responseLog
+```
+
+After inspecting and addressing any errors and obtaining permission for the full 200-case run, the existing resume-capable runner may be invoked with `--limit 200 --output $responseLog`; then rerun the exact same read-only audit. It skips previously captured IDs when model/mode/prompt fingerprints match. **Do not publish the private response log, insert real customer data, or commit it to Git.** Set `OLLAMA_MODEL` to your actual installed model before starting; this note does not claim the local Ollama runtime is available or that any JBB attempt succeeded.
+
+If the 200 responses were already captured elsewhere, **do not rerun attacks**: supply their actual existing response-log path to the audit command. Logs must match the expected JSONL capture shape. `response_level_attack_success_rate` remains unavailable pending independent human review, and JBB harmful compliance must not be confused with a TC-002 canary leak.

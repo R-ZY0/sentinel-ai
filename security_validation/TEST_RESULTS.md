@@ -86,3 +86,16 @@ remain **unverified on the developer's machine until run and reported**.
 - Expected (NOT yet observed) next result: 68 component tests + 7 scenario tests = 75 tests total.
 - The default no-response audit must match `security_validation/examples/jbb_expected_summary.json`: 200 source rows, 100 per class, no captured responses, no human adjudication, and all rates uncomputed.
 - Run the new commands on the developer checkout before reporting a pass. Do not claim any of the 200 prompts succeeded as attacks or leaked sensitive data.
+
+## Full repository Windows run at commit `9575a606` (developer log, 2026-10-29)
+
+The developer supplied the complete PowerShell log after `git pull --ff-only origin feature/security-validation-week-02`, fast-forward `908e333..9575a60`. This is **user-reported execution**, not an automated CI run.
+
+- `py -m unittest discover -s security_validation/tests -p "test_*.py" -v`: **68 tests, 68 passed, 0 failures**, `Ran 68 tests in 0.032s`, `OK`.
+- `py -m security_validation.examples.audit_jbb_dataset`: `200` uniquely indexed dataset prompts, 100 harmful / 100 benign, **200 unadjudicated**, `captured=0`, `pending_capture=200`, `reviewed=0`, `not_reviewable=200`; ASR, accuracy, F1 unset.
+- `py -m security_validation.examples.run_jbb_batch_sample`: synthetic 2-case example; 1 captured, 1 reviewed as `safe_refusal`, 1 pending capture, zero live target results.
+- `py -m security_validation.examples.run_traceability_example`: synthetic TC-002 receipt generated; `validation_status=confirmed` and `integrity_verified=true`. Random HMAC receipt fingerprints change by execution; they do not assert independent authorization.
+- The 7 Week-2 scenario tests **previously passed at commit `908e333`**; this most recent log did not rerun them.
+- The 200 source prompts were not executed by `audit_jbb_dataset` and cannot be counted as captured responses or validated vulnerabilities.
+
+**Next evidence gate:** collect actual authorized local target responses using the existing dataset runner, store them outside Git, then use `audit_jbb_dataset --responses <path>`. Do not claim response-level accuracy or attack success until human assessment of the captured text.

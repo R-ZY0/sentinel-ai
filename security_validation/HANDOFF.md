@@ -73,3 +73,9 @@ Integration tests are deterministic and offline; this is an **integration-bounda
 - CI/PR gate: run new `test_jbb_batch.py` alongside the existing component and scenario tests and save actual output. This revision has not been verified on the developer's machine yet.
 
 - Added `security_validation/examples/jbb_expected_summary.json` as a zero-capture snapshot for the exact checked-in 200-case dataset. No dataset rows or other member files modified.
+
+## Developer verification on 2026-10-29
+
+At feature branch commit `9575a606`, user-provided Windows output reported **68/68 component unit tests passing**, successfully audited the 200-item JBB source dataset (100 harmful, 100 benign; no target responses captured), and produced a verified synthetic HMAC evidence receipt. See `TEST_RESULTS.md`. The older 7 scenario regression tests passed on `908e333` and should be rerun when preparing the PR. Full local Ollama response capture and human response adjudication are the remaining steps before any scored evaluation or live Finding claims.
+
+No `main`, release branch, shared contracts, backend, or other member code was edited in this documentation update.
