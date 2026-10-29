@@ -42,7 +42,7 @@ It executes authorized AI security tests, evaluates responses using heuristic ru
 
 ## Dependencies
 
-Install the component dependencies from the repository root:
+Install the shared component dependencies from the repository root. garak and PyRIT must be installed separately using the Week 2 isolated tool environments section below:
 
     .\.venv\Scripts\python.exe -m pip install -r .\attack_engine\requirements.txt
 
@@ -85,3 +85,25 @@ Test only systems you own or have explicit authorization to assess.
 - Timeout and exception coverage require separate verification
   against real target failure scenarios.
 - Examples are illustrative, not captured live outputs.
+
+## Week 2 isolated tool environments
+
+garak 0.17.0 and PyRIT 1.1.0 require incompatible
+versions of datasets and must be installed separately.
+
+Create two local virtual environments using supported Python
+versions:
+
+    python -m venv .venv-garak
+    python -m venv .venv-pyrit
+
+Install dependencies separately:
+
+    .venv-garak/Scripts/python -m pip install -r attack_engine/requirements-garak.txt
+    .venv-pyrit/Scripts/python -m pip install -r attack_engine/requirements-pyrit.txt
+
+For the probe-mapping version test, define GARAK_PYTHON
+and PYRIT_PYTHON to point to the respective Python
+executables.
+
+These environments must not be committed to Git.

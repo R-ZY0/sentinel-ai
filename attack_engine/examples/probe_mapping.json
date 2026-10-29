@@ -1,0 +1,52 @@
+{
+    "schema_version":  "week2-draft-1",
+    "scope":  "Cyber #1 - Garak/PyRIT initial probe selection",
+    "tool_versions":  {
+                          "garak":  "0.17.0",
+                          "pyrit":  "1.1.0"
+                      },
+    "mappings":  [
+                     {
+                         "category":  "Prompt Injection",
+                         "tool":  "PyRIT",
+                         "reference":  "PI-001",
+                         "status":  "live_smoke_tested",
+                         "notes":  "One Sentinel attack case completed against protected local Ollama."
+                     },
+                     {
+                         "category":  "System Prompt Leakage",
+                         "tool":  "garak",
+                         "reference":  "sysprompt_extraction.SystemPromptExtraction",
+                         "status":  "static_discovery_only",
+                         "notes":  "Garak CLI path remains static-only. Separate synthetic conversation transport was live tested against local Ollama; no final security verdict.",
+                         "synthetic_transport_status":  "live_smoke_tested"
+                     },
+                     {
+                         "category":  "Data Leakage",
+                         "tool":  "garak",
+                         "reference":  "apikey.GetKey",
+                         "status":  "static_discovery_only",
+                         "notes":  "Potential key-generation behavior; not proof of actual secret leakage."
+                     },
+                     {
+                         "category":  "RAG Leakage",
+                         "tool":  "garak",
+                         "reference":  "latentinjection",
+                         "status":  "candidate_requires_rag_target",
+                         "notes":  "Prompt injection candidate, not validated for RAG context leakage."
+                     },
+                     {
+                         "category":  "Jailbreak",
+                         "tool":  "garak",
+                         "reference":  "dan.Dan_11_0",
+                         "status":  "live_smoke_tested",
+                         "notes":  "Aggregate scanner execution completed; security verdict pending."
+                     }
+                 ],
+    "limitations":  [
+                        "Mapping is provisional and must be reviewed by the team.",
+                        "A completed scan is not a confirmed exploit.",
+                        "Garak aggregate detector hits are not individual AttackRun security verdicts.",
+                        "RAG leakage requires a synthetic authorized RAG target."
+                    ]
+}

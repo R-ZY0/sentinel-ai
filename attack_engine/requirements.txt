@@ -1,4 +1,2 @@
-﻿pyrit==1.1.0
-psycopg[binary]==3.3.6
+﻿psycopg[binary]==3.3.6
 requests==2.34.2
-garak==0.17.0
