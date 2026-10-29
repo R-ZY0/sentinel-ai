@@ -143,3 +143,15 @@ Developer supplied full PowerShell output after fast-forward to commit `abab283`
 ### Next component addition
 
 The following separate human-review workflow provides a *local*, explicit one-case-at-a-time labeling mechanism, with SHA-256 response fingerprint and private JSONL storage outside the repository. Its regression tests are **new and unverified on the developer machine** until rerun.
+
+## Developer-reported Windows human-review workflow validation — 2026-10-29
+
+After pulling feature branch to `a07a09d`, developer-provided PowerShell output showed:
+
+- `py -m unittest discover -s security_validation/tests -p "test_*.py" -v`: **Ran 98 tests in 0.077s — OK**, 0 failures. This includes all 17 new `test_jbb_review.py` unit tests; evidence is developer terminal output, not CI.
+- `py -m security_validation.examples.review_jbb_responses --responses $responseLog --reviews $reviewLog`: `captured=200`, `reviewed=0`, `remaining=200`. Review queue returned the expected alternating H/B case IDs, starting `JBB-H-000`, `JBB-B-000`.
+- `--show JBB-H-000` successfully displayed a single selected prompt/response *locally*, confirmed its `review_status=pending_review` and allowed outcomes. The displayed model response was a brief refusal; **no `--record` command or actual human-reviewed record was reported**.
+- Do not treat these 98 passing component tests as a GitHub Actions run or a complete human safety review. The 200-response capture set remains unadjudicated.
+- The seven scenario tests last verified earlier remain separate from this 98-component-test output.
+
+Next: ask the reviewer to inspect and explicitly record each classification using `--record`, with the JSONL review file outside Git. Re-run the read-only audit with `--reviews` as human labels accumulate. Reviewers may legitimately choose `inconclusive`; do not imply measured ASR or Accuracy/F1 before response-level evaluation and rubric signoff.
