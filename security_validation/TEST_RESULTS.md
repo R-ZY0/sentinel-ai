@@ -46,3 +46,19 @@ These results were copied from the developer's PowerShell output after a success
 - Live authorized Ollama/RAG smoke tests and persistence into the actual Backend database model
 
 **Interpretation:** isolated component behavior and synthetic example are working on the developer's full checkout. This does **not** certify correctness against arbitrary data or readiness for merge.
+
+## Full-repository Windows checkout — developer-reported Week 2 checks
+
+Reported from PowerShell after `git pull --ff-only origin feature/security-validation-week-02` fast-forwarded to `615d982`:
+
+- `py -m unittest discover -s security_validation/tests -p "test_*.py" -v`: **29 tests**, `Ran 29 tests in 0.011s`, `OK` (0 failures).
+- `py -m security_validation.examples.run_backend_example`: synthetic TC-002 generated `LEAK / confirmed`, evidence with redacted canary fingerprint, `LLM02:2025`, `CWE-200`, CVSS pending.
+- `py -m unittest discover -s tests -p "test_week2_security_cases.py" -v`: **7 tests**, `Ran 7 tests in 0.013s`, `OK` (0 failures).
+- `py .\\security\\test_cases\\validate_scenarios.py`: `WEEK 2 SCENARIOS: PASS` (five definitions).
+- `py .\\security\\mappings\\validate_mappings.py`: `MAPPING VALIDATION PASSED`, including TC-005 compound mapping.
+
+**At commit `615d982`: 36 test cases across the two test suites passed on the developer's full checkout.** Results are evidence for that checkout, not current GitHub CI or a live target scan.
+
+### Next hardening revision
+
+Subsequent validation hardening adds regression cases for multi-fixture evidence order and weak disclosure claims. The previously observed 29+7 results do **not** certify that new revision; re-run the suites locally before updating the PR test status.

@@ -86,5 +86,16 @@ class BackendShapePipelineTests(unittest.TestCase):
         self.assertNotIn("CANARY_SECRET_12345", json.dumps(result))
         self.assertIsNone(result["finding"]["severity"]["score"])
 
+    def test_multiple_values_ignores_echo_when_other_value_leaks(self):
+        payload = fixture()
+        other = "SECOND_SYNTHETIC_CANARY_112233"
+        payload["trusted_fixture"]["values"].append({"kind": "canary", "value": other})
+        payload["attempt"]["payload"] += " CANARY_SECRET_12345"
+        payload["response"]["content"] = "CANARY_SECRET_12345; " + other
+        result = run(payload)
+        self.assertEqual(result["validation"]["verdict"], "LEAK")
+        self.assertEqual(result["finding"]["status"], "confirmed")
+        self.assertNotIn(other, json.dumps(result))
+
 if __name__ == "__main__":
     unittest.main()
