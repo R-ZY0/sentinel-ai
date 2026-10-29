@@ -8,7 +8,7 @@
 - Static Week 2 scenario definitions validator: **PASS, 5 scenarios**. This does not validate a live leak.
 - JBB protected local capture: **200/200** valid responses, 0 errors; only **2** explicitly human-adjudicated. The remaining 198 have AI-only preliminary proposals.
 - JBB-H-004 redacted audit: 19 exact synthetic canary matches in 1 of 200 responses, prompt does not contain it. This is **candidate TC-002 evidence, not an independently confirmed Finding**.
-- The pasted terminal output did **not** include the result of the last `security/mappings/validate_mappings.py` command; record as pending.
+- Developer has now rerun `py .\security\mappings\validate_mappings.py`: **MAPPING VALIDATION PASSED, exit code 0**, with TC-001..TC-005 and TC-005 compound mapping confirmed. The earlier `.pypy` typo was corrected.
 - CI results and actual Backend persistence validation have not been provided.
 
 ## PR diff ownership blocker (live GitHub branch comparison)
@@ -32,8 +32,7 @@ A PR from this branch into `release/week-01` has the same other-workstream path 
 
 ## Remaining gates before handoff signoff
 
-1. Capture the actual mapping validator output/exit code, or re-run after pull:
-   `py .\\security\\mappings\\validate_mappings.py`
+1. **Complete**: Mapping validation PASS, exit code 0 (developer transcript, 2026-10-29).
 2. Backend Owner: verify stable AttackAttempt/Response IDs and approved test-case mapping; provide server-authenticated fixture/provenance and a reviewed Finding persistence adapter. See `BACKEND_INTEGRATION_CHECKLIST.md`.
 3. Approve authorized test conditions for a new private ephemeral system-message canary and gather runtime/ACL evidence; use `JBB_CANARY_CASE_REVIEW.md` as the tracking document.
 4. Sign off status/risk/impact and decide whether numeric CVSS v4.0 or real CTI enrichment is justified; never auto-fill.
@@ -45,6 +44,10 @@ A PR from this branch into `release/week-01` has the same other-workstream path 
 
 **Base:** team-approved integration branch (currently other open workstream PRs use `develop`).
 
-**Body:** Delivers deterministic TC-001..TC-005 validation; conservative evidence provenance, attacker echo and partial-claim handling; schema-valid Finding OWASP/CWE output; read-only Backend-shaped adapter and HMAC evidence receipts; protected local JBB coverage and private review tools; redacted JBB-H-004 candidate audit; CVSS v4.0 review gates and static CTI mappings. Verified 110 local tests, 200/200 captured, five static scenario definitions. **Excludes** production DB integration, official scored JBB claims, independent TC-002 disclosure confirmation, validated CVSS score and live CTI feed.
+**Body:** Delivers deterministic TC-001..TC-005 validation; conservative evidence provenance, attacker echo and partial-claim handling; schema-valid Finding OWASP/CWE output; read-only Backend-shaped adapter and HMAC evidence receipts; protected local JBB coverage and private review tools; redacted JBB-H-004 candidate audit; CVSS v4.0 review gates and static CTI mappings. Verified 110 local tests, 200/200 captured, five static scenario definitions and OWASP/CWE mapping validation PASS (exit 0). **Excludes** production DB integration, official scored JBB claims, independent TC-002 disclosure confirmation, validated CVSS score and live CTI feed.
 
 **Security note:** Do not commit the private raw model replies, planted secret value, review files or keys.
+
+## Verification update (2026-10-29)
+
+Mapping validator is now verified **PASS / exit 0**. All reported developer-local component and static validation gates pass; the **remaining pre-PR blocker is a 10-path non-owned diff** against `develop`/`release/week-01`, plus independent runtime/authorization evidence and team signoff. No Cyber #2 PR was created from this dirty comparison; coordinate on a scoped branch/merge base without modifying other members' paths.
