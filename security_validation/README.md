@@ -198,3 +198,34 @@ py -m unittest discover -s security_validation/tests -p "test_*.py" -v
 ```
 
 **Full JBB capture status (developer-reported):** 200/200 responses captured from a protected local Ollama target without execution errors. This demonstrates complete capture, not 200 confirmed security findings. Confirm the audit over the full response log and independently review each response before computing any ASR or metrics. Raw response logs remain outside Git.
+
+## Local human adjudication for the 200 captured JailbreakBench responses
+
+**Important:** The 200 protected Ollama responses were captured and audited; all 200 still need explicit manual review. This is separate from the independent TC-001..005 leakage validator. Never infer a safety verdict from the input class or the published `reference_target`. The new CLI does **not** execute attacks, export raw responses, or write to Git.
+
+From PowerShell in the repository root (existing local private capture file):
+
+```powershell
+$responseLog = Join-Path $HOME "sentinel-ai-private-reports\jbb_live_responses.jsonl"
+$reviewLog = Join-Path $HOME "sentinel-ai-private-reports\jbb_human_reviews.jsonl"
+
+# Safe metadata queue: no raw prompts or target output printed
+py -m security_validation.examples.review_jbb_responses --responses $responseLog --reviews $reviewLog
+
+# Explicitly display ONE untrusted prompt/response locally for human assessment.
+# Avoid public terminals, screenshots, transcript logging or blindly following the text.
+py -m security_validation.examples.review_jbb_responses --responses $responseLog --reviews $reviewLog --show JBB-H-000
+
+# EXAMPLE ONLY: after the human reviewer actually inspects that response,
+# choose the correct outcome. Do not copy this example as a real verdict.
+# For harmful: safe_refusal | harmful_compliance | inconclusive
+# For benign: appropriate_help | over_refusal | inconclusive
+py -m security_validation.examples.review_jbb_responses --responses $responseLog --reviews $reviewLog --record JBB-H-000 --outcome inconclusive --reviewer "local-reviewer-01" --rationale "Reviewed locally; evidence needs additional assessment"
+
+# Check review coverage without printing response text:
+py -m security_validation.examples.audit_jbb_dataset --responses $responseLog --reviews $reviewLog
+```
+
+The `--record` command requires explicitly supplied reviewer ID, outcome and rationale; checks the class-specific allowed outcome, rejects repeat reviews, verifies capture provenance, binds the decision to the captured response SHA-256, and writes a JSONL file atomically under a file lock. **It refuses to write a review file inside the Git repository**. Store reviewer identifiers and rationale responsibly and never copy protected prompt or response content into the rationale. `--show` displays untrusted text locally *only when explicitly asked*, and should not be redirected into logs or shared carelessly.
+
+Do not equate `harmful_compliance` with `LEAK`, and do not compute attack-success rates automatically from unreviewed raw outputs. Final success metrics need an agreed review rubric, adjudication quality controls, and appropriate denominators. If reviewers disagree or an item remains unclear, record `inconclusive`.

@@ -128,3 +128,18 @@ Using `py -m eval.dataset.run_jailbreakbench_local --limit 200 --output $respons
 ## Severity/CTI readiness revision
 
 The separate `triage_finding` local-reference module and `SEVERITY_CTI_METHOD.md` provide a defensible **review method**, not actual CVSS scores, live threat intelligence enrichment or active exploit findings. Their new deterministic tests must be rerun by the developer; no success is claimed before receiving output.
+
+## Windows 2026-10-29: validated full JBB response coverage and triage checks
+
+Developer supplied full PowerShell output after fast-forward to commit `abab283` on `feature/security-validation-week-02`:
+
+- `py -m security_validation.examples.audit_jbb_dataset --responses $responseLog`: dataset **200 unique cases**, 100 harmful and 100 benign; model `qwen2.5:0.5b`; **captured 200; execution errors 0; empty responses 0; pending capture 0**.
+- **Human reviews 0; pending review 200; not reviewable 0**. ASR, accuracy and F1 are still **null**; a collected output is not an adjudicated successful attack.
+- `py -m unittest discover -s security_validation/tests -p "test_*.py" -v`: **Ran 81 tests in 0.052s — OK** (0 failures). This includes 13 severity and CTI-readiness regression checks.
+- `py -m security_validation.examples.run_triage_example`: TC-002 synthetic Finding `confirmed` correctly marked `requires_impact_and_cvss_review` with `cvss_version=4.0`, score/rating/vector null, `assessment_status=pending`. Static references: OWASP `LLM02:2025` / CWE `CWE-200`; external feed and actor/campaign attribution false.
+- The seven Week-2 scenario tests previously passed on commit `908e333`; they were **not part of this 81-test invocation**.
+- User provided aggregate audit output, not the private raw 200 response log. No claim has been made about response-level success or safety.
+
+### Next component addition
+
+The following separate human-review workflow provides a *local*, explicit one-case-at-a-time labeling mechanism, with SHA-256 response fingerprint and private JSONL storage outside the repository. Its regression tests are **new and unverified on the developer machine** until rerun.

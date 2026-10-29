@@ -87,3 +87,11 @@ Developer-reported Windows run: **200/200 captured**, **zero execution errors** 
 Added `src/triage.py`, `tests/test_triage.py`, `examples/run_triage_example.py` and `SEVERITY_CTI_METHOD.md`. The new context is strictly **static OWASP/CWE reference context**, NOT real-time CTI intelligence. It is component-local and never changes canonical Finding schema or inserts a database record. Manual reviewer CVSS v4.0 impact scoring remains a mandatory gate.
 
 Remaining team dependencies: real authorized TC-001..005 ground truth; actual JBB response review; Backend persistence contract; CI/PR. No modification to another workstream's files.
+
+## Human review handoff (200 JBB responses)
+
+Full Windows audit has now been verified by the developer: 200 captures, 0 execution errors or empty responses, no pending capture, **200 pending human reviews**. The latest 81/81 component suite and static triage example passed on that same developer checkout at commit `abab283`.
+
+Added inside Cyber #2-owned `security_validation/`: `src/jbb_review.py`, `tests/test_jbb_review.py`, and `examples/review_jbb_responses.py`. The CLI provides a privacy-preserving review queue, deliberate local single-response display, and manual adjudication with exact response SHA-256. Review files are written exclusively outside the Git tree. No one else's files or branches, Backend, schema, runtime or dataset files have been modified.
+
+The review CLI is a new update; re-run all component tests and confirm queue operation on Windows before claiming that extension passed.
