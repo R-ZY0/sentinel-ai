@@ -79,3 +79,10 @@ Copied from the user-provided PowerShell log after a successful fast-forward:
 These are real developer-reported test results for `908e333`, not CI tests.
 The newer HMAC evidence receipt implementation adds further tests; those
 remain **unverified on the developer's machine until run and reported**.
+
+## Batch audit revision (post `908e333`)
+
+- 12 HMAC traceability tests and 20 JailbreakBench batch tests added after the last developer-reported 43/43 pass.
+- Expected (NOT yet observed) next result: 68 component tests + 7 scenario tests = 75 tests total.
+- The default no-response audit must match `security_validation/examples/jbb_expected_summary.json`: 200 source rows, 100 per class, no captured responses, no human adjudication, and all rates uncomputed.
+- Run the new commands on the developer checkout before reporting a pass. Do not claim any of the 200 prompts succeeded as attacks or leaked sensitive data.

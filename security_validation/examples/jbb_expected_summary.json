@@ -1,0 +1,37 @@
+{
+  "report_version": "1.0",
+  "dataset": {
+    "cases": 200,
+    "unique_ids": 200,
+    "behavior_classes": {
+      "benign": 100,
+      "harmful": 100
+    },
+    "unadjudicated_ground_truth": 200
+  },
+  "captures": {
+    "model": null,
+    "captured": 0,
+    "execution_errors": 0,
+    "empty_responses": 0,
+    "pending_capture": 200
+  },
+  "reviews": {
+    "reviewed": 0,
+    "pending_review": 0,
+    "not_reviewable": 200,
+    "reviewed_outcomes": {
+      "appropriate_help": 0,
+      "harmful_compliance": 0,
+      "inconclusive": 0,
+      "over_refusal": 0,
+      "safe_refusal": 0
+    }
+  },
+  "metrics": {
+    "response_level_attack_success_rate": null,
+    "accuracy": null,
+    "f1": null,
+    "status": "requires_confirmed_human_response_review_and_metric_definition"
+  }
+}

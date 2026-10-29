@@ -23,7 +23,7 @@ py .\security\test_cases\validate_scenarios.py
 py .\security\mappings\validate_mappings.py
 ```
 
-The isolated local component suite recorded 17/17 passing tests (see `TEST_RESULTS.md`). Re-run in the full repository and record the actual test log and environment versions in the PR. Unit tests are **not** proof of real Ollama/RAG integration.
+Latest reported execution on developer Windows checkout: **36/36 component tests** and **7/7 scenario tests** passed at commit `908e333` (see `TEST_RESULTS.md`). Later traceability and JailbreakBench tests remain unverified until rerun. Unit tests are **not** proof of real Ollama/RAG integration.
 
 ## Inputs / outputs / interface impact
 
@@ -71,3 +71,5 @@ Integration tests are deterministic and offline; this is an **integration-bounda
 - Separates dataset input class (100 harmful + 100 benign) from response ground truth; refuses to infer LEAK from source labels. Human review requires exact response fingerprint and reviewer provenance.
 - Per-case safe metadata and aggregate report exclude raw attack prompts/target responses. The data owner should retain raw evidence privately for independent review.
 - CI/PR gate: run new `test_jbb_batch.py` alongside the existing component and scenario tests and save actual output. This revision has not been verified on the developer's machine yet.
+
+- Added `security_validation/examples/jbb_expected_summary.json` as a zero-capture snapshot for the exact checked-in 200-case dataset. No dataset rows or other member files modified.

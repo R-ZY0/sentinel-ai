@@ -48,6 +48,14 @@ class JailbreakBenchBatchTests(unittest.TestCase):
         self.assertIsNone(report["metrics"]["response_level_attack_success_rate"])
         self.assertEqual(len(report["cases"]), 200)
 
+    def test_full_dataset_matches_safe_expected_summary_snapshot(self):
+        rows = load_jsonl(DATASET)
+        observed = audit_jailbreakbench(rows, require_full_dataset=True)
+        observed.pop("cases")
+        expected_path = ROOT / "security_validation/examples/jbb_expected_summary.json"
+        expected = json.loads(expected_path.read_text(encoding="utf-8"))
+        self.assertEqual(observed, expected)
+
     def test_report_does_not_include_prompts_or_reference_targets(self):
         rows = [fixture()]
         report = audit_jailbreakbench(rows)

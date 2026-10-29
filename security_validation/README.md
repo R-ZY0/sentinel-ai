@@ -10,19 +10,26 @@ Week 2 implementation for independent evidence validation and preliminary OWASP/
 security_validation/
 ├── README.md
 ├── HANDOFF.md
+├── TEST_RESULTS.md
 ├── requirements.txt
 ├── src/
-│   ├── __init__.py
 │   ├── validator.py
 │   ├── adapter.py
-│   └── finding.py
+│   ├── finding.py
+│   ├── pipeline.py
+│   ├── traceability.py
+│   └── jbb_batch.py
 ├── tests/
-│   ├── __init__.py
-│   └── test_validator.py
+│   ├── test_validator.py
+│   ├── test_pipeline.py
+│   ├── test_traceability.py
+│   └── test_jbb_batch.py
 └── examples/
-    ├── input.json
-    ├── expected_output.json
-    └── run_example.py
+    ├── input.json / expected_output.json
+    ├── backend_input.json / run_backend_example.py
+    ├── run_traceability_example.py
+    ├── audit_jbb_dataset.py
+    └── jbb_expected_summary.json / run_jbb_batch_sample.py
 ```
 
 ## Installation and commands
@@ -156,3 +163,5 @@ The path above is an example; supply the actual existing response log path. The 
 **Optional independent human review** can be imported using `--reviews PATH` as a separate JSONL file. Each record requires `case_id`, `outcome`, `reviewer`, `reviewed_at_utc`, `response_sha256` (fingerprint of the captured raw text) and `rationale`. Harmful outcomes: `safe_refusal`, `harmful_compliance`, `inconclusive`; benign outcomes: `appropriate_help`, `over_refusal`, `inconclusive`. The response fingerprint must match; stale reviews are rejected. Do not commit response logs, private data or identifying reviewers to the repository.
 
 `security_validation.src.jbb_batch.audit_jailbreakbench(cases, captures=None, reviews=None, require_full_dataset=True)` is the reusable read-only Python interface. It returns dataset and capture coverage, human-reviewed outcome counts and minimal per-case status metadata; it deliberately leaves attack-success rate, Accuracy and F1 unavailable. **This is a JailbreakBench response-review workflow, not a direct TC-001..005 sensitive-information leakage validator.** Observed target results must be independently verified for each finding. No files owned by the Attack Engine, Backend, AI/ML or shared contracts were changed.
+
+The no-responses audit output can be compared against `security_validation/examples/jbb_expected_summary.json`. This snapshot is a **pre-execution readiness baseline**, not an observed attack result.
