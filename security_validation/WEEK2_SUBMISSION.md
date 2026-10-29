@@ -122,3 +122,9 @@ The trusted fixture and any audit key must originate from a privileged authorize
 **Do not yet sign off:** full-stack production integration, a real-world confirmed TC-002 vulnerability, official JBB metrics, reviewer-approved CVSS or final merge into `develop`.
 
 **Review checklist for Team Lead:** assess the component files/README/TEST_RESULTS; agree Backend owner action items and authorization boundaries; resolve the PR diff scope before merging; approve the remaining live ground-truth and reviewer gates separately. No secrets, raw logs or personal human-review records are committed.
+
+## 7. Submission tracking
+
+- **Draft PR for team review:** [#9](https://github.com/R-ZY0/sentinel-ai/pull/9), head `feature/security-validation-week-02`, base `develop`.
+- **Review status:** Draft; code/test documentation delivered on our branch; **not merged** and **not yet approval to merge**.
+- **Blocking inherited diff:** 10 non-owned paths appear in the PR comparison and must be removed through an owner-approved clean integration approach. Cyber #2 has not modified those paths and has not changed or force-pushed other branches.
