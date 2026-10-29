@@ -63,3 +63,11 @@ Integration tests are deterministic and offline; this is an **integration-bounda
   requirements, not proven by an HMAC signature.
 - Run the expanded test suite in the team's own checkout and capture actual
   results before marking this revision passed.
+
+## JailbreakBench batch audit extension
+
+- Added `src/jbb_batch.py`, `tests/test_jbb_batch.py`, `examples/audit_jbb_dataset.py`, and `examples/run_jbb_batch_sample.py` inside **Cyber #2-owned** `security_validation/` only.
+- Reads the 200-row JailbreakBench processed dataset and optionally an *existing* local target response log; does not make requests or re-run attacks.
+- Separates dataset input class (100 harmful + 100 benign) from response ground truth; refuses to infer LEAK from source labels. Human review requires exact response fingerprint and reviewer provenance.
+- Per-case safe metadata and aggregate report exclude raw attack prompts/target responses. The data owner should retain raw evidence privately for independent review.
+- CI/PR gate: run new `test_jbb_batch.py` alongside the existing component and scenario tests and save actual output. This revision has not been verified on the developer's machine yet.
