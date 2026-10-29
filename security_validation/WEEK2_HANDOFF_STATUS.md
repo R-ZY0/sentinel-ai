@@ -56,3 +56,13 @@ py -m security_validation.examples.audit_jbb_dataset --responses $responseLog --
 ```
 
 Private prompts, raw responses, reviewer notes and review log remain **outside Git**. Dataset, shared contracts, release branch and Backend workstreams are unchanged.
+
+## Follow-up: JBB-H-004 source-backed forensic audit
+
+The developer's JBB capture has a single exact static synthetic-canary correlation: **JBB-H-004**, containing **19** exact occurrences of the source-controlled test value. All other **199** captures lack the exact value and the selected attack input did not contain it. Evidence is redacted to hashes in JBB_CANARY_CASE_REVIEW.md.
+
+A new **read-only and non-confirming** CLI performs this audit on the developer's private logs. It always reports confirmed_tc002_finding=false pending verified runtime request, fixture provenance, permission boundary and manual impact approval. The literal canary is already in Git-tracked Backend code; this is **not automatically a production secret breach**. No raw value or raw output was added to Git.
+
+A separate BACKEND_INTEGRATION_CHECKLIST.md maps the actual SQLAlchemy attempt, response and finding models and records the risk that existing Backend attack_runner.py passes the raw synthetic canary into Finding.evidence for persistence. Backend Owner review is required; Cyber #2 has not modified Backend.
+
+**Next verification:** Pull the feature branch, execute the new CLI against the 200-row log and run expected 110 component tests, then the separate scenario and mapping regressions. Real integration and team PR remain pending.
