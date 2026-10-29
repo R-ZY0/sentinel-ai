@@ -75,3 +75,18 @@ Confidence `1.0` on a deterministic exact match/nonmatch and `0.0` for inconclus
 - The Backend SQLAlchemy Finding model differs from the JSON Finding contract; do not insert the document directly into the DB without an agreed reviewed adapter.
 
 See `HANDOFF.md` for changed files, integration ownership and PR checklist.
+
+## Read-only backend-shaped integration (Week 2)
+
+This integration stays **entirely inside `security_validation/`**; it does not modify any Backend/API/DB files or any release branch. From the repository root:
+
+```powershell
+py -m unittest discover -s security_validation/tests -p "test_*.py" -v
+py -m security_validation.examples.run_backend_example
+```
+
+The `security_validation.src.validate_backend_execution(attempt=..., response=..., test_case_id=..., trusted_fixture=..., finding_id=...)` function accepts Week-1-style Backend dictionaries, checks the response association, runs independent evidence validation, validates the resulting Finding against the canonical JSON Schema, and returns `{"validation": ..., "finding": ...}`. It **does not** persist a row or call the network.
+
+New example: `security_validation/examples/backend_input.json`; it must produce the same `security_validation/examples/expected_output.json` as the direct component example. The Integration suite is in `security_validation/tests/test_pipeline.py`.
+
+**Blocking integration contract questions for Full Stack (review before implementation):** `AttackAttempt.attack_case_id` identifies a probe, not a TC-00x scenario. The Backend must supply a trusted mapping to `test_case_id` and authorize the target. The existing Backend SQLAlchemy Finding row differs from the JSON Finding schema; persistence requires a jointly reviewed adapter. Trusted fixture/ACL/provenance flags must come from server-side ownership/authorization checks, **not** user input or a Judge output.

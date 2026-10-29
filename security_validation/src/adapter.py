@@ -13,12 +13,18 @@ def from_backend_records(attempt: dict, response: dict | None, *, test_case_id: 
         raise TypeError("attempt must be a dictionary")
     if response is not None and not isinstance(response, dict):
         raise TypeError("response must be a dictionary or None")
+    def required(key):
+        value = attempt.get(key)
+        if value is None or not str(value).strip():
+            raise ValueError(f"Missing or empty AttackAttempt.{key}")
+        return str(value)
+
     attack = {
         "test_case_id": test_case_id,
-        "scan_id": str(attempt.get("scan_id") or ""),
-        "attack_id": str(attempt.get("attack_case_id") or ""),
-        "attempt_id": str(attempt.get("id") or ""),
-        "payload": attempt.get("payload"),
+        "scan_id": required("scan_id"),
+        "attack_id": required("attack_case_id"),
+        "attempt_id": required("id"),
+        "payload": required("payload"),
     }
     if response is not None and str(response.get("attack_attempt_id")) != attack["attempt_id"]:
         raise ValueError("Response is not associated with the supplied AttackAttempt")

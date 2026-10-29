@@ -43,3 +43,9 @@ The isolated local component suite recorded 17/17 passing tests (see `TEST_RESUL
 - CTI enrichment/triage and production severity assessment are **not implemented**.
 
 The component makes no assertion that an arbitrary real user can set trusted flags and prove a leak.
+
+## Week 2 Backend-shaped integration update
+
+Added only under `security_validation/`: `src/pipeline.py`, `tests/test_pipeline.py`, `examples/backend_input.json`, and `examples/run_backend_example.py`. Strengthened the component adapter to reject missing stable IDs/payload. Exported `validate_backend_execution` as a component-owned function. **No changes to `release/week-01`, `main`, Backend, Attack Engine, contracts or database.**
+
+Integration tests are deterministic and offline; this is an **integration-boundary contract test**, not a live backend/DB test. Verify on the developer checkout and record actual results before PR review. The Backend owner must explicitly approve the probe-to-test-case mapping and persistence adapter.
