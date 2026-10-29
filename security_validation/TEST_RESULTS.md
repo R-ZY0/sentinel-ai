@@ -176,3 +176,18 @@ Developer-provided PowerShell output from the feature branch confirmed:
 - Actual TC-002 confirmation, HMAC-backed trusted runtime provenance, reviewer impact signoff, real backend persistence, PR and CI acceptance all remain pending.
 
 **Do not conflate** these successful isolated checks with production end-to-end security validation or official human-reviewed JBB model metrics.
+
+## Windows 2026-10-29: OWASP/CWE mapping command verified
+
+Developer reran the exact script after an initial command-typing typo (`validate_mappings.pypy`, exit 2). The corrected `py .\\security\\mappings\\validate_mappings.py` produced:
+
+```text
+MAPPING VALIDATION PASSED
+OWASP mappings: TC-001 to TC-005 present
+CWE mappings: TC-001 to TC-005 present
+TC-005 compound mapping: validated
+Day 6 security taxonomy mapping: COMPLETE
+Exit code: 0
+```
+
+This completes the requested developer-local Week 2 component/static validation set: **110/110 unit tests**, **5/5 static scenario definitions**, and **OWASP/CWE mapping validation PASS (exit 0)**. It does **not** change the unresolved live Backend integration, independently authenticated H-004 fixture/ACL provenance, human-only JBB labels (2 approved of 200), or PR ownership review.
