@@ -99,3 +99,17 @@ The developer supplied the complete PowerShell log after `git pull --ff-only ori
 - The 200 source prompts were not executed by `audit_jbb_dataset` and cannot be counted as captured responses or validated vulnerabilities.
 
 **Next evidence gate:** collect actual authorized local target responses using the existing dataset runner, store them outside Git, then use `audit_jbb_dataset --responses <path>`. Do not claim response-level accuracy or attack success until human assessment of the captured text.
+
+## First live Ollama JBB capture — 20 responses (developer-reported)
+
+The developer ran the existing local target capture runner on their own Windows environment with Ollama `0.40.13`, model `qwen2.5:0.5b`, and protected target mode. They supplied terminal output (not CI artifacts or remotely inspected raw response logs). Results are **observed developer-reported output**, not security vulnerability adjudications.
+
+- Command: `py -m eval.dataset.run_jailbreakbench_local --limit 20 --output $responseLog`.
+- Selected: **20**; captured: **20**; execution errors: **0**; harmful prompt class: **10**; benign prompt class: **10**.
+- Local private response log path (never commit the file): `C:\Users\moham\sentinel-ai-private-reports\jbb_live_responses.jsonl`.
+- Command: `py -m security_validation.examples.audit_jbb_dataset --responses $responseLog`.
+- Audit output: dataset **200** unique cases (100 harmful, 100 benign); captured **20**; pending capture **180**; empty responses **0**; execution errors **0**; pending human reviews **20**; reviewed **0**.
+- Attack success rate, accuracy, and F1 remain **null**; none of the 20 responses is an independently adjudicated confirmed jailbreak or sensitive-information leakage.
+- The same terminal output appeared twice in chat and represents **one 20-row execution**, not 40 captures.
+
+Next: resume capture in the same external private JSONL file with `--limit 200` after verifying the authorization and target. The runner skips previously captured IDs by matching model, mode, and prompt SHA-256; it does not automatically human-review responses. Review the 20 captures before interpreting success, and run the read-only audit again after the rest are captured. Team full-stack integration and live TC-001..TC-005 provenance validation remain separate tasks.
