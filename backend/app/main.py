@@ -3,7 +3,7 @@ from fastapi import FastAPI
 from .logging_setup import configure_logging
 from .database import Base, engine
 from .schema_migrations import ensure_attack_case_id_column
-from .routers import health, scans, targets
+from .routers import auth, health, scans, targets
 from .error_handlers import register_error_handlers
 
 
@@ -24,3 +24,4 @@ register_error_handlers(app)
 app.include_router(health.router)
 app.include_router(targets.router)
 app.include_router(scans.router)
+app.include_router(auth.router)

@@ -870,4 +870,17 @@ docker compose up -d --build api celery
 
 Press Ctrl+C in the foreground Compose terminal to stop the services. Named volumes preserve PostgreSQL data and Ollama models. Do not use `docker compose down -v` unless you intend to delete those volumes.
 
-Current scope: one local probe, an exact-canary judge, and initial database tables. Authentication, garak/PyRIT integration, adaptive judging, and schema migrations remain future work.
+The Week 1 instructions above describe the original demo. For the current Week 2 setup, follow the authentication guide below before starting services or accessing targets and scans. Adaptive judging and full garak/PyRIT orchestration remain future integration work.
+
+## Week 2 backend updates
+
+Target management supports creation, listing, retrieval, full updates, and deletion. Targets with scan history cannot be deleted.
+
+- [Target API reference](docs/integration/targets-api.md)
+- [Backend verification results](docs/integration/test-results.md)
+
+Authentication supports registration, Argon2 password hashing, JWT login, and current-user lookup. Target and scan endpoints require login.
+
+Before starting the stack, generate JWT_SECRET_KEY and save it in .env using the authentication guide below.
+
+- [Authentication setup and API reference](docs/integration/auth-api.md)

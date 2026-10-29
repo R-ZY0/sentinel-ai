@@ -7,8 +7,9 @@ from kombu.exceptions import OperationalError
 from sqlalchemy.orm import sessionmaker
 
 from .database import engine, get_db
+from .dependencies import get_current_user
 from .main import app
-from .models import Scan, Target
+from .models import Scan, Target, User
 
 
 class ScanSubmissionTests(unittest.TestCase):
@@ -34,6 +35,11 @@ class ScanSubmissionTests(unittest.TestCase):
                 yield db
 
         app.dependency_overrides[get_db] = override_db
+        app.dependency_overrides[get_current_user] = lambda: User(
+            email="test-user@example.com",
+            password_hash="unused-in-this-test",
+            is_active=True,
+        )
         self.client = TestClient(app, raise_server_exceptions=False)
 
     def tearDown(self):

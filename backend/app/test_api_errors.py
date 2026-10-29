@@ -5,7 +5,9 @@ from fastapi.testclient import TestClient
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 
 from .database import get_db
+from .dependencies import get_current_user
 from .main import app
+from .models import User
 
 
 class ApiErrorTests(unittest.TestCase):
@@ -16,6 +18,11 @@ class ApiErrorTests(unittest.TestCase):
             yield self.db
 
         app.dependency_overrides[get_db] = override_db
+        app.dependency_overrides[get_current_user] = lambda: User(
+            email="test-user@example.com",
+            password_hash="unused-in-this-test",
+            is_active=True,
+        )
         self.client = TestClient(app, raise_server_exceptions=False)
 
     def tearDown(self):

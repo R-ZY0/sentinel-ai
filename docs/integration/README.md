@@ -1,5 +1,7 @@
 # Sentinel AI — Week 1 Integrated Build
 
+> Historical Week 1 runbook: the commands below describe the Week 1 release. On the Week 2 platform branch, startup also requires JWT_SECRET_KEY, and all target and scan endpoints require login. Follow [Authentication setup](auth-api.md) and the [Target API reference](targets-api.md) for current usage. Older HTTP examples below omit the required Bearer token.
+
 **Team setup, local run, testing, evidence review and release handoff**
 **Repository:** [`R-ZY0/sentinel-ai`](https://github.com/R-ZY0/sentinel-ai)
 **Working branch:** `integration/week-01`

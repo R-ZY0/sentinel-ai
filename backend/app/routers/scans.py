@@ -7,9 +7,14 @@ from ..database import get_db
 from ..models import Scan, Target
 from ..scan_tasks import run_scan
 from ..schemas import ScanCreate, ScanRead
+from ..dependencies import get_current_user
 
 logger = logging.getLogger(__name__)
-router = APIRouter(prefix="/scans", tags=["Scans"])
+router = APIRouter(
+    prefix="/scans",
+    tags=["Scans"],
+    dependencies=[Depends(get_current_user)],
+)
 
 
 @router.post(
