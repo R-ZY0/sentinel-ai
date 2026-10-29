@@ -51,3 +51,7 @@ A PR from this branch into `release/week-01` has the same other-workstream path 
 ## Verification update (2026-10-29)
 
 Mapping validator is now verified **PASS / exit 0**. All reported developer-local component and static validation gates pass; the **remaining pre-PR blocker is a 10-path non-owned diff** against `develop`/`release/week-01`, plus independent runtime/authorization evidence and team signoff. No Cyber #2 PR was created from this dirty comparison; coordinate on a scoped branch/merge base without modifying other members' paths.
+
+## Actual draft PR opened for review (2026-10-29)
+
+[PR #9 — Cyber #2 Week 2 Handoff](https://github.com/R-ZY0/sentinel-ai/pull/9) was opened **as a DRAFT only**, head `feature/security-validation-week-02`, base `develop`. This is review visibility and a branch-level component submission, **not** merge approval. Live preflight found 41 owned paths under `security_validation/` and 10 inherited, non-owned differences in `security/test_cases/` and `tests/`. Resolve the latter with the integration owner before converting to ready-for-review or merging; do not edit other teams' paths from this task.
