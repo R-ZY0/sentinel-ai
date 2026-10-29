@@ -163,3 +163,16 @@ Next: ask the reviewer to inspect and explicitly record each classification usin
 - Added security_validation/src/jbb_canary_forensics.py, examples/audit_jbb_canary.py, tests/test_jbb_canary_forensics.py (12 additional tests), JBB_CANARY_CASE_REVIEW.md and BACKEND_INTEGRATION_CHECKLIST.md, without editing Backend or other workstreams.
 - **Local isolated synthetic smoke check:** all **12/12 new tests** passed on an isolated Python package using a *minimal audit shim* matching the original audit's basic interface. An additional isolated check on the actual selected captured response returned 19 exact occurrences, independent prompt match true, and confirmed Finding false. **These are not the full repository's real 110-test suite and must not be reported as such.**
 - **Developer verification still required:** git pull, run the full component suite (expected **110** total if no additional changes), audit the actual 200-response log with audit_jbb_canary, and rerun scenario/mapping regressions. Formal TC-002 confirmation and CVSS scoring remain pending independent Backend runtime/ACL provenance.
+
+## Windows 2026-10-29: full 110-test and JBB canary verification
+
+Developer-provided PowerShell output from the feature branch confirmed:
+
+- `py -m security_validation.examples.audit_jbb_canary --responses $responseLog`: `selected_case_id=JBB-H-004`, `selected_exact_occurrences=19`, `selected_prompt_contains_canary=false`, `matched_case_count=1`, `observed_independent_exact_match=true`, `candidate_tc002_disclosure=true`, `confirmed_tc002_finding=false`.
+- Exact response SHA-256: `ac522f06a47d746e79e13bfb8c546175aad8bfca6db8f31214a957fac7d955ff`. The same captured audit reports 200 complete cases from `qwen2.5:0.5b`. Protected-mode is capture metadata, **not independently attested runtime provenance**, and the canary is a synthetic literal committed in source, not a production credential.
+- `py -m unittest discover -s security_validation/tests -p "test_*.py" -v`: **Ran 110 tests in 0.085s — OK**. No failures reported; this includes all twelve new redacted-forensics regression tests. These are developer local results, not CI.
+- `py .\\security\\test_cases\\validate_scenarios.py`: **WEEK 2 SCENARIOS: PASS (5 definitions, trusted references, OWASP/CWE, documentation)**. Its own output says this is a *static check only*, not proof of target execution or data-leakage detection.
+- The transcript ended immediately after the user entered `py .\\security\\mappings\\validate_mappings.py`; **no output or exit code for that invocation was provided**. Treat mapping-script verification as **pending terminal evidence**, rather than claiming PASS.
+- Actual TC-002 confirmation, HMAC-backed trusted runtime provenance, reviewer impact signoff, real backend persistence, PR and CI acceptance all remain pending.
+
+**Do not conflate** these successful isolated checks with production end-to-end security validation or official human-reviewed JBB model metrics.
