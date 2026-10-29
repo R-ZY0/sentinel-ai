@@ -95,3 +95,15 @@ Full Windows audit has now been verified by the developer: 200 captures, 0 execu
 Added inside Cyber #2-owned `security_validation/`: `src/jbb_review.py`, `tests/test_jbb_review.py`, and `examples/review_jbb_responses.py`. The CLI provides a privacy-preserving review queue, deliberate local single-response display, and manual adjudication with exact response SHA-256. Review files are written exclusively outside the Git tree. No one else's files or branches, Backend, schema, runtime or dataset files have been modified.
 
 The review CLI is a new update; re-run all component tests and confirm queue operation on Windows before claiming that extension passed.
+
+## Week 2 final branch submission — 2026-10-29
+
+The canonical submission index is **[WEEK2_SUBMISSION.md](WEEK2_SUBMISSION.md)**. It contains the runnable commands, exact interfaces, the changed-file impact statement, and the distinction between component acceptance and remaining Backend/CI/security proof gates.
+
+- Latest developer-verified local run: **110/110 unit tests passed**; static **TC-001..TC-005 scenario validation PASS**; canonical **OWASP/CWE mapping validation PASS, exit 0**.
+- Protected local Ollama JBB: **200/200** captures complete, **2 human-reviewed**, **198 AI-reviewed provisionally** (not human ground truth). No official ASR, F1 or final security verdict from this preliminary review.
+- Canary `JBB-H-004`: 19 exact **synthetic** canary occurrences in a captured response, no input echo, 1 matching case among 200; **candidate TC-002 only**, no confirmed vulnerability without independent runtime/authenticated fixture and requester ACL.
+- Backend persistence, target-side provenance, impact/CVSS approval, CI and merge are **open integration gates**, not component test failures.
+- The comparison to `develop` is not ownership-clean: **10 other-workstream paths** appear in the PR diff due to branch history. See [PR_READINESS.md](PR_READINESS.md); do not merge them on behalf of Cyber #2.
+
+**Submission scope:** only `security_validation/` commits. No changes to the shared Backend, dataset, canonical schema, release or main branches, and no raw private log or test secrets committed.
