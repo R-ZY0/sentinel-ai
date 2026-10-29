@@ -6,7 +6,7 @@
 
 ## Added files
 
-- `security_validation/README.md`, `HANDOFF.md`, `requirements.txt`.
+- `security_validation/README.md`, `HANDOFF.md`, `TEST_RESULTS.md`, `requirements.txt`.
 - `security_validation/__init__.py` and `security_validation/src/{__init__,validator,adapter,finding}.py`.
 - `security_validation/tests/{__init__,test_validator}.py`.
 - `security_validation/examples/{input.json,expected_output.json,run_example.py}`.
@@ -23,7 +23,7 @@ py .\security\test_cases\validate_scenarios.py
 py .\security\mappings\validate_mappings.py
 ```
 
-Record the actual test log and environment versions in the PR. Unit tests are **not** proof of real Ollama/RAG integration.
+The isolated local component suite recorded 17/17 passing tests (see `TEST_RESULTS.md`). Re-run in the full repository and record the actual test log and environment versions in the PR. Unit tests are **not** proof of real Ollama/RAG integration.
 
 ## Inputs / outputs / interface impact
 
