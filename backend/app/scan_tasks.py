@@ -1,6 +1,6 @@
 import logging
 from uuid import UUID
-
+import os
 from .attack_runner import AttackRunner
 from .celery_app import celery_app
 from .database import SessionLocal
@@ -26,7 +26,18 @@ def run_scan(scan_id: str):
         db.commit()
 
         try:
-            result = AttackRunner().run(UUID(scan_id), target_id)
+            pipeline = os.environ.get("SENTINEL_PIPELINE", "week1")
+
+            if pipeline == "week2":
+                from .week2_runner import Week2AttackRunner
+
+                runner = Week2AttackRunner()
+            elif pipeline == "week1":
+                runner = AttackRunner()
+            else:
+                raise ValueError("Unsupported SENTINEL_PIPELINE")
+
+            result = runner.run(UUID(scan_id), target_id)
 
             db.refresh(scan)
             scan.status = "completed"

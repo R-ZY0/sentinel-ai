@@ -1,0 +1,70 @@
+name: Week 2 backend integration
+
+on:
+  push:
+    branches:
+      - integration/week-02
+  pull_request:
+    branches:
+      - release/week-02
+
+jobs:
+  backend-integration:
+    runs-on: ubuntu-latest
+    env:
+      POSTGRES_DB: sentinel_ci
+      POSTGRES_USER: sentinel_ci
+      POSTGRES_PASSWORD: sentinel_ci_only
+      POSTGRES_PORT: "15432"
+      REDIS_PORT: "16379"
+      JWT_SECRET_KEY: ci-only-signing-key-never-use-outside-tests
+      SENTINEL_PIPELINE: week1
+      LOCAL_TARGET_MODE: protected
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate configuration
+        run: docker compose config --quiet
+
+      - name: Build backend images
+        run: docker compose build api celery
+
+      - name: Start database and queue
+        run: docker compose up -d --wait postgres redis
+
+      - name: Create test tables
+        run: >-
+          docker compose run --rm --no-deps api python -c
+          "from app.database import Base, engine; import app.models; Base.metadata.create_all(engine)"
+
+      - name: Run backend integration and regression tests
+        run: >-
+          docker compose run --rm --no-deps api python -m unittest
+          app.test_week2_pipeline app.test_auth app.test_targets
+          app.test_api_errors app.test_scan_submission app.test_pipeline -v
+
+      - name: Run security component tests
+        run: >-
+          docker compose run --rm --no-deps api python -m unittest
+          discover -s security_validation/tests -p 'test_*.py' -v
+
+      - name: Run AI runner and scan-review tests
+        run: >-
+          docker compose run --rm --no-deps api python -m unittest
+          judge.tests.test_week2_baselines
+          judge.tests.test_week2_evaluation
+          judge.integration.test_scan_review -v
+
+      - name: Verify worker package imports
+        run: >-
+          docker compose run --rm --no-deps celery python -c
+          "from app.week2_runner import Week2AttackRunner; print('Worker imports OK')"
+
+      - name: Show service logs on failure
+        if: failure()
+        run: docker compose logs --tail=80
+
+      - name: Stop CI services
+        if: always()
+        run: docker compose down

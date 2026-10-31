@@ -1,7 +1,7 @@
 from datetime import datetime, timezone
 from uuid import UUID, uuid4
 
-from sqlalchemy import Boolean, DateTime, ForeignKey, String, Text, UniqueConstraint
+from sqlalchemy import Boolean, DateTime, ForeignKey, String, Text, UniqueConstraint,JSON
 from sqlalchemy.orm import Mapped, mapped_column
 
 from .database import Base
@@ -99,6 +99,21 @@ class Finding(Base):
         default="suspected",
     )
     evidence: Mapped[str] = mapped_column(Text)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        default=utc_now,
+    )
+
+class ResponseEvaluation(Base):
+    __tablename__ = "response_evaluations"
+
+    id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4)
+    response_id: Mapped[UUID] = mapped_column(
+        ForeignKey("responses.id"),
+        unique=True,
+    )
+    baseline_results: Mapped[dict] = mapped_column(JSON)
+    security_result: Mapped[dict] = mapped_column(JSON)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         default=utc_now,

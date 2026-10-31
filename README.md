@@ -4,6 +4,17 @@
 
 Sentinel AI is a web-based AI security testing platform designed to assess authorized LLM and RAG applications for data-leakage risks. It combines existing red-team probes with baseline judges and a CyberV-inspired adaptive judging loop.
 
+
+## Week 2 integrated build
+
+For the combined team setup and current scope, use:
+
+- [Week 2 startup and integration guide](docs/integration/week-02.md)
+- [Week 2 verification evidence and limitations](docs/integration/week-02-verification.md)
+
+The older Week 1 instructions describe historical behavior.
+
+
 ## 1. Project Vision
 
 The final V1 system allows an authorized user to register an AI target, configure a scan, run security probes, collect responses, evaluate them with baseline and adaptive judges, request a second round when confidence is insufficient, collect evidence, create findings, map them to security/CTI classifications, and generate a PDF report.

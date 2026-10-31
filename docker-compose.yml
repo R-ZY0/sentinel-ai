@@ -4,7 +4,9 @@ services:
     image: ollama/ollama:latest
     environment:
       OLLAMA_HOST: http://ollama:11434
-    command: ["pull", "qwen2.5:0.5b"]
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - ollama pull qwen2.5:0.5b && ollama pull llama3.2:3b
     depends_on:
       ollama:
         condition: service_healthy
@@ -73,6 +75,9 @@ services:
       POSTGRES_PORT: "5432"
       CELERY_BROKER_URL: redis://redis:6379/0
       CELERY_RESULT_BACKEND: redis://redis:6379/1
+      SENTINEL_PIPELINE: ${SENTINEL_PIPELINE:-week2}
+      JUDGE_MODEL: llama3.2:3b
+      PYTHONPATH: /app
     depends_on:
       redis:
         condition: service_healthy
