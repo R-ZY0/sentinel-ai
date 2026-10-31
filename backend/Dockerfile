@@ -22,6 +22,8 @@ COPY judge ./judge
 COPY security_validation ./security_validation
 COPY security ./security
 
+COPY eval/dataset/processed/jailbreakbench_processed.jsonl ./eval/dataset/processed/jailbreakbench_processed.jsonl
+
 RUN useradd --create-home --uid 10001 sentinel
 USER sentinel
 
