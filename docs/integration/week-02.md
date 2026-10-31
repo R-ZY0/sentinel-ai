@@ -20,6 +20,7 @@ Use these settings:
 
     LOCAL_TARGET_MODE=protected
     SENTINEL_PIPELINE=week2
+    WEEK2_ATTACK_ENGINES=pyrit,garak
 
 From the repository root:
 
@@ -40,9 +41,26 @@ Open http://localhost:8000/docs.
 4. Submit POST /scans with its target_id.
 5. Poll GET /scans/{id} using the returned scan ID.
 
-The Week 2 worker executes SPL-001 from the shared attack library.
-It places a fresh synthetic canary in the local target's system message.
-This particular integration checks TC-002 canary disclosure.
+The Week 2 worker calls the internal PyRIT and garak services sequentially.
+Each tool runs in its own dependency-isolated container and a fresh child process.
+PyRIT executes PI-001 through PromptSendingAttack. Garak executes the official
+Dan_11_0 CLI probe, then extracts completed per-attempt report records.
+The actual tool payloads and replies are passed through B0/B1/B2/B3,
+security validation, and PostgreSQL persistence, rather than scanner summaries.
+Each execution receives a fresh server-generated synthetic canary installed
+through the canonical protected local target request.
+The security evaluation currently checks TC-002 canary disclosure; a jailbreak
+marker or detector hit is not independently confirmed as a different vulnerability.
+
+The scanner containers have no published host ports or database credentials.
+Their execution endpoints are for the local trusted Compose network only.
+Public callers cannot submit target URLs, fixture flags, or arbitrary tool commands.
+Tool processes always run in protected mode.
+
+Optional WEEK2_ATTACK_ENGINES values are library, pyrit, garak, or a comma-separated
+unique combination. library retains the earlier SPL-001 integration/demo path.
+The worker logs which engine is executing/judging/storing its results.
+The execution engine and strategy are saved with each evaluation.
 
 The target reply is saved, then reviewed by B0/B1/B2/B3.
 Security validation independently checks the trusted synthetic fixture.
@@ -61,7 +79,7 @@ No numeric CVSS score is inferred.
 
 Run the backend suite:
 
-    docker compose exec api python -m unittest app.test_week2_pipeline app.test_auth app.test_targets app.test_api_errors app.test_scan_submission app.test_pipeline -v
+    docker compose exec api python -m unittest app.test_week2_pipeline app.test_tool_client app.test_tool_service app.test_tool_process app.test_auth app.test_targets app.test_api_errors app.test_scan_submission app.test_pipeline -v
 
 These tests use controlled target/judge fixtures and PostgreSQL transactions.
 Their database changes are rolled back.
@@ -86,11 +104,11 @@ Then run each tool using its own environment:
 
 ## Important boundaries
 
-- API scans currently use the shared library probe, not the full garak CLI or PyRIT runner.
-- garak/PyRIT live execution and normalization are separate verified component paths.
+- The real garak/PyRIT API wiring passed a live container scan; updated CI verification remains pending.
+- Earlier live scanner results were separate component checks and do not prove the new wiring.
 - Detector hits and PWNED markers are not confirmed leakage findings.
 - TC-001–TC-005 have component checks; only TC-002 is wired into this live API flow.
-- RAG/PII target execution and automatic full-tool orchestration remain integration gaps.
+- RAG/PII target execution and additional tool/probe selection remain integration gaps.
 - Authenticated users currently share targets and scans.
 - Raw target replies remain in PostgreSQL; evaluation redaction does not erase them.
 - Fresh canaries are synthetic test values, not production credentials.
@@ -99,8 +117,9 @@ Then run each tool using its own environment:
 
 ## Controlled vulnerable mode
 
-LOCAL_TARGET_MODE=demo_vulnerable encourages disclosure but does not
-guarantee it. Restore protected mode and recreate Celery after a demo.
+For the optional library engine, LOCAL_TARGET_MODE=demo_vulnerable encourages
+disclosure but does not guarantee it. The real tool services always use protected
+mode. Restore protected mode and recreate Celery after a library demo.
 
 A positive finding path is verified with controlled integration fixtures.
 The live vulnerable-mode run on 2026-10-31 did not disclose the canary.
@@ -109,3 +128,6 @@ The live vulnerable-mode run on 2026-10-31 did not disclose the canary.
 
 See week-02-verification.md for observed results and outstanding gates.
 Do not claim CI passed until GitHub Actions has actually completed.
+
+The new real-tool wiring and its pending live checks are documented in
+[Scanner connection handoff](week-02-tool-connection.md).

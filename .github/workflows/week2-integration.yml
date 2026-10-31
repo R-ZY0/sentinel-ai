@@ -42,7 +42,9 @@ jobs:
         run: >-
           docker compose run --rm --no-deps api python -m unittest
           app.test_week2_pipeline app.test_auth app.test_targets
-          app.test_api_errors app.test_scan_submission app.test_pipeline -v
+          app.test_api_errors app.test_scan_submission app.test_pipeline
+          app.test_tool_client app.test_tool_service app.test_tool_process
+          app.test_week2_scenarios -v
 
       - name: Run security component tests
         run: >-

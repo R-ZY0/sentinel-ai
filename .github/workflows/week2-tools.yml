@@ -33,6 +33,17 @@ jobs:
           python -m pip install
           -r attack_engine/requirements-${{ matrix.tool }}.txt
 
+      - name: Validate isolated tool Docker build
+        run: >-
+          docker build -f backend/Dockerfile.tool
+          --build-arg TOOL=${{ matrix.tool }}
+          -t sentinel-tool:${{ matrix.tool }} .
+
+      - name: Verify installed tool inside its image
+        run: >-
+          docker run --rm sentinel-tool:${{ matrix.tool }} python -c
+          "import os, importlib; from app.tool_service import health; result=health(); tool=os.environ['SENTINEL_TOOL']; assert result['tool'] == tool; importlib.import_module('garak.attempt' if tool == 'garak' else 'pyrit.executor.attack.single_turn.prompt_sending'); print(result)"
+
       - name: Run garak regression tests
         if: matrix.tool == 'garak'
         run: >-

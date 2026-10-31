@@ -78,6 +78,7 @@ services:
       SENTINEL_PIPELINE: ${SENTINEL_PIPELINE:-week2}
       JUDGE_MODEL: llama3.2:3b
       PYTHONPATH: /app
+      WEEK2_ATTACK_ENGINES: ${WEEK2_ATTACK_ENGINES:-pyrit,garak}
     depends_on:
       redis:
         condition: service_healthy
@@ -85,6 +86,44 @@ services:
         condition: service_healthy
       ollama-init:
         condition: service_completed_successfully
+      pyrit:
+        condition: service_healthy
+      garak:
+        condition: service_healthy
+
+  pyrit:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile.tool
+      args:
+        TOOL: pyrit
+    environment:
+      OLLAMA_BASE_URL: http://ollama:11434
+      OLLAMA_MODEL: qwen2.5:0.5b
+      LOCAL_TARGET_MODE: protected
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8080/health', timeout=5)"]
+      interval: 10s
+      timeout: 6s
+      retries: 12
+      start_period: 20s
+
+  garak:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile.tool
+      args:
+        TOOL: garak
+    environment:
+      OLLAMA_BASE_URL: http://ollama:11434
+      OLLAMA_MODEL: qwen2.5:0.5b
+      LOCAL_TARGET_MODE: protected
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8080/health', timeout=5)"]
+      interval: 10s
+      timeout: 6s
+      retries: 12
+      start_period: 20s
 
   ollama:
     image: ollama/ollama:latest
