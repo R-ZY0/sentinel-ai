@@ -98,5 +98,19 @@ Garak:
 - TC-001–TC-005 component checks do not establish live RAG/PII coverage.
 - Raw target replies remain stored in PostgreSQL.
 - User ownership isolation, automatic CVSS scoring, and adaptive judging are absent.
-- CI workflows have been added but are not yet verified on GitHub.
+- Both Week 2 CI workflows passed on 7ae93e6.
 - Full Week 2 completion must not be claimed without acknowledging these boundaries.
+
+
+## GitHub CI verification
+
+Both Week 2 workflows passed on commit 7ae93e6:
+
+- Week 2 backend integration
+- Week 2 attack tools
+
+The initial backend CI run failed because the container lacked the
+JailbreakBench test dataset. The Dockerfile was corrected, all 110 security
+tests passed locally inside Docker, and both GitHub workflows then passed.
+
+Live model/scanner checks remain separate from the fixture-based CI checks.
