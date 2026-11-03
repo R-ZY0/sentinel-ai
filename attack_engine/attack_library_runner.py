@@ -1,19 +1,23 @@
 ﻿import uuid
+from typing import TYPE_CHECKING
 
 from attack_engine.attack_library import ATTACK_LIBRARY
 from attack_engine.attack_case_adapter import attack_case_to_attack_run
-from attack_engine.pyrit_runner import PyRITRunner
 from attack_engine.basic_judge import BasicJudge
 from attack_engine.finding import Finding
 from attack_engine.second_round import create_second_round_attack
 
+if TYPE_CHECKING:
+    from attack_engine.pyrit_runner import PyRITRunner
+
 
 async def run_attack_library(
-    runner: PyRITRunner,
+    runner: "PyRITRunner",
     target_name: str,
     finding_repository=None,
     second_round: bool = False,
 ):
+    """Execute the legacy attack library through the supplied async runner."""
     results = []
     judge = BasicJudge()
 
@@ -69,3 +73,16 @@ async def run_attack_library(
             results.append(result)
 
     return results
+
+
+def create_pyrit_runner(*args, **kwargs):
+    """Create a PyRIT runner only when the optional dependency is installed."""
+    try:
+        from attack_engine.pyrit_runner import PyRITRunner
+    except ImportError as exc:
+        raise ImportError(
+            "PyRIT is required to create a PyRITRunner. "
+            "Install the project's optional PyRIT requirements."
+        ) from exc
+
+    return PyRITRunner(*args, **kwargs)
