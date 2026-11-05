@@ -35,7 +35,8 @@ def build_finding(attack_run: dict, validation: dict, *, finding_id: str, root: 
     evidence = validation.get("evidence")
     if not isinstance(evidence, list) or not evidence or any(
         not isinstance(item, dict)
-        or str(item.get("attempt_id")) != str(attack_run.get("attempt_id"))
+        or not isinstance(item.get("attempt_id"), str)
+        or item["attempt_id"] != attack_run.get("attempt_id")
         for item in evidence
     ):
         raise ValueError("Evidence must belong to the source attempt")
