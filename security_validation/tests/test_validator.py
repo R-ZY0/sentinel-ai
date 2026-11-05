@@ -122,6 +122,20 @@ class SecurityValidationTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             build_finding(p["attack_run"], v, finding_id="finding-invalid")
 
+    def test_finding_rejects_verdict_status_disagreement(self):
+        p = sample()
+        result = verdict(p)
+        result["validation_status"] = "rejected"
+        with self.assertRaises(ValueError):
+            build_finding(p["attack_run"], result, finding_id="invalid-status")
+
+    def test_finding_rejects_cross_attempt_evidence(self):
+        p = sample()
+        result = verdict(p)
+        result["evidence"][0]["attempt_id"] = "another-attempt"
+        with self.assertRaises(ValueError):
+            build_finding(p["attack_run"], result, finding_id="invalid-evidence")
+
     def test_synthetic_input_and_output_example(self):
         p = copy.deepcopy(EXAMPLE)
         v = verdict(p)
