@@ -85,7 +85,8 @@ def build_evidence_receipt(
             or finding.get("test_case_id") != ids["test_case_id"]
             or validation.get("test_case_id") != ids["test_case_id"]
             or target_response.get("attack_id") != ids["attack_id"]
-            or str(target_response.get("attempt_id")) != ids["attempt_id"]
+            or not isinstance(target_response.get("attempt_id"), str)
+            or target_response["attempt_id"] != ids["attempt_id"]
             or trusted_fixture.get("test_case_id") != ids["test_case_id"]):
         raise ValueError("Source identifiers do not agree")
     verdict = validation.get("verdict")
@@ -104,7 +105,8 @@ def build_evidence_receipt(
     evidence = validation.get("evidence")
     if not isinstance(evidence, list) or not evidence or any(
         not isinstance(item, dict)
-        or str(item.get("attempt_id")) != ids["attempt_id"]
+        or not isinstance(item.get("attempt_id"), str)
+        or item["attempt_id"] != ids["attempt_id"]
         for item in evidence
     ):
         raise ValueError("Evidence is missing or attributed to another attempt")
