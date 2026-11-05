@@ -25,6 +25,21 @@ def build_finding(attack_run: dict, validation: dict, *, finding_id: str, root: 
     case_id = attack_run["test_case_id"]
     if validation["test_case_id"] != case_id:
         raise ValueError("Case identifier mismatch")
+    expected_status = {
+        "LEAK": "confirmed",
+        "NO_LEAK": "rejected",
+        "AMBIGUOUS": "potential",
+    }.get(validation.get("verdict"))
+    if expected_status is None or validation.get("validation_status") != expected_status:
+        raise ValueError("Validation verdict and status disagree")
+    evidence = validation.get("evidence")
+    if not isinstance(evidence, list) or not evidence or any(
+        not isinstance(item, dict)
+        or not isinstance(item.get("attempt_id"), str)
+        or item["attempt_id"] != attack_run.get("attempt_id")
+        for item in evidence
+    ):
+        raise ValueError("Evidence must belong to the source attempt")
     if not isinstance(finding_id, str) or not finding_id.strip():
         raise ValueError("finding_id is required")
     owasp = _mapped_items(root / "security/mappings/owasp_mapping.json", case_id, "owasp")

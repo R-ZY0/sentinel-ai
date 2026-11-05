@@ -34,4 +34,10 @@ def from_backend_records(attempt: dict, response: dict | None, *, test_case_id: 
         "status": attempt.get("status"),
         "response": response.get("content") if response is not None else None,
     }
+
+    # Preserve optional upstream execution errors. The validator must not
+    # confirm a leak from an execution that reported an error.
+    if response is not None and response.get("error"):
+        normalized_response["error"] = response["error"]
+
     return attack, normalized_response

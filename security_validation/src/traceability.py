@@ -85,8 +85,8 @@ def build_evidence_receipt(
             or finding.get("test_case_id") != ids["test_case_id"]
             or validation.get("test_case_id") != ids["test_case_id"]
             or target_response.get("attack_id") != ids["attack_id"]
-            or (target_response.get("attempt_id") is not None
-                and str(target_response["attempt_id"]) != ids["attempt_id"])
+            or not isinstance(target_response.get("attempt_id"), str)
+            or target_response["attempt_id"] != ids["attempt_id"]
             or trusted_fixture.get("test_case_id") != ids["test_case_id"]):
         raise ValueError("Source identifiers do not agree")
     verdict = validation.get("verdict")
@@ -100,6 +100,21 @@ def build_evidence_receipt(
             or finding.get("evidence") != validation.get("evidence")
             or finding.get("category") != validation.get("category")):
         raise ValueError("Finding and validation are inconsistent")
+    # A receipt must never authenticate evidence attributed to another
+    # attempt, or a confirmed finding without validated leakage evidence.
+    evidence = validation.get("evidence")
+    if not isinstance(evidence, list) or not evidence or any(
+        not isinstance(item, dict)
+        or not isinstance(item.get("attempt_id"), str)
+        or item["attempt_id"] != ids["attempt_id"]
+        for item in evidence
+    ):
+        raise ValueError("Evidence is missing or attributed to another attempt")
+    if status == "confirmed" and not any(
+        item.get("type") == "leakage" and item.get("validated") is True
+        for item in evidence
+    ):
+        raise ValueError("Confirmed finding requires validated leakage evidence")
     content = target_response.get("response")
     body = {
         "receipt_version": "1.0",
