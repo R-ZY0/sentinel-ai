@@ -40,4 +40,4 @@ jobs:
       - name: Execute real PostgreSQL acceptance tests
         run: python -m unittest discover -s tests -p 'test_week1_postgres.py' -v
       - name: Verify Backend to AI/Cyber pipeline with real Postgres and mocked local target
-        run: python -m unittest app.test_pipeline -v
+        run: python -m unittest app.tests.test_pipeline -v

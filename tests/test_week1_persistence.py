@@ -7,7 +7,7 @@ from sqlalchemy import create_engine, inspect, event, select, text
 from sqlalchemy.orm import Session
 from app.database import Base
 from app.models import Scan, Target, AttackAttempt, Response, Finding
-from app.attack_persistence import persist_attack_run
+from app.services.attack_persistence import persist_attack_run
 from app.schema_migrations import ensure_attack_case_id_column
 from attack_engine.backend_contract import attack_run_to_backend_records
 from attack_engine.attack_run import AttackRun

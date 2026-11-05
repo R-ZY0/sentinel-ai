@@ -62,7 +62,7 @@ Both tool containers must be healthy before the worker starts.
 
 Run the full backend suite against PostgreSQL:
 
-    docker compose exec api python -m unittest app.test_week2_pipeline app.test_tool_client app.test_tool_service app.test_tool_process app.test_auth app.test_targets app.test_api_errors app.test_scan_submission app.test_pipeline -v
+    docker compose exec api python -m unittest app.tests.test_week2_pipeline app.tests.test_tool_client app.tests.test_tool_service app.tests.test_tool_process app.tests.test_auth app.tests.test_targets app.tests.test_api_errors app.tests.test_scan_submission app.tests.test_pipeline -v
 
 Authorize in Swagger and create one new scan for the configured local target.
 Do not create multiple scans while waiting: both real tools and their model

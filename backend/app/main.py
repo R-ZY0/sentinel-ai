@@ -1,17 +1,16 @@
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from .logging_setup import configure_logging
-from .database import Base, engine
-from .schema_migrations import ensure_attack_case_id_column
-from .routers import auth, health, scans, targets
+from .database import engine
+from .migrations import upgrade
+from .routers import auth, health, scans, targets, attacks
 from .error_handlers import register_error_handlers
 
 
 configure_logging()
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    Base.metadata.create_all(bind=engine)
-    ensure_attack_case_id_column(engine)
+    upgrade(engine)
     try:
         yield
     finally:
@@ -25,3 +24,4 @@ app.include_router(health.router)
 app.include_router(targets.router)
 app.include_router(scans.router)
 app.include_router(auth.router)
+app.include_router(attacks.router)

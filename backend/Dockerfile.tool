@@ -11,4 +11,4 @@ COPY attack_engine ./attack_engine
 ENV SENTINEL_TOOL=${TOOL}
 RUN useradd --create-home --uid 10001 sentinel
 USER sentinel
-CMD ["uvicorn", "app.tool_service:app", "--host", "0.0.0.0", "--port", "8080", "--no-access-log"]
+CMD ["uvicorn", "app.tools.service:app", "--host", "0.0.0.0", "--port", "8080", "--no-access-log"]

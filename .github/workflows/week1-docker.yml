@@ -30,4 +30,4 @@ jobs:
           -e DATABASE_URL=sqlite:///:memory:
           -e CELERY_BROKER_URL=redis://localhost:6379/0
           -e CELERY_RESULT_BACKEND=redis://localhost:6379/1
-          api python -c "from app.attack_runner import AttackRunner; from app.attack_engine import AttackEngine; from judge.canary_judge import CanaryRegexJudge; assert AttackEngine().probes()[0].attack_case_id == 'SPL-001'; print('Week1 container module import: PASS')"
+          api python -c "from app.services.attack_runner import AttackRunner; from app.services.attack_engine import AttackEngine; from judge.canary_judge import CanaryRegexJudge; assert AttackEngine().probes()[0].attack_case_id == 'SPL-001'; print('Week1 container module import: PASS')"

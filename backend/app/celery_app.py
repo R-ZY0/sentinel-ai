@@ -13,7 +13,7 @@ celery_app = Celery(
     "sentinel",
     broker=os.environ["CELERY_BROKER_URL"],
     backend=os.environ["CELERY_RESULT_BACKEND"],
-    include=["app.scan_tasks"],
+    include=["app.tasks.scans"],
 )
 
 celery_app.conf.update(

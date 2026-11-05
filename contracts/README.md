@@ -25,3 +25,12 @@ AttackRun -> TargetResponse -> JudgeVerdict -> Finding -> Report
 ## Current status
 
 The backend currently implements the initial Target and Scan API records plus stored attempts, responses, and findings. The complete shared schemas for `AttackRun`, `TargetResponse`, `JudgeVerdict`, `Finding`, and `Report` will be added after the responsible team members agree on their fields.
+
+## Week 3–4 platform examples
+
+`examples/week34-target-request.json` shows typed target registration;
+`examples/week34-scan-request.json` and `examples/week34-scan-response.json`
+show configuration and the new created-before-start flow. UUIDs are illustrative;
+use IDs returned by your own API. These examples do not change the teammates'
+shared attack/judge/finding contracts. See the
+[backend guide](../docs/integration/week-03-04-backend.md) for compatibility details.

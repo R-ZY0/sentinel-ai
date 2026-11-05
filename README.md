@@ -5,6 +5,14 @@
 Sentinel AI is a web-based AI security testing platform designed to assess authorized LLM and RAG applications for data-leakage risks. It combines existing red-team probes with baseline judges and a CyberV-inspired adaptive judging loop.
 
 
+## Current backend: Weeks 3–4
+
+Target types/validation, per-user ownership, configured scans, explicit start/cancel,
+database migrations, and the organized backend layout are documented in the
+[Week 3–4 backend guide](docs/integration/week-03-04-backend.md).
+New scans are created first; call `/start` or pass `auto_start: true` to queue them.
+Backend tests now live together under `backend/app/tests/`.
+
 ## Week 2 integrated build
 
 For the combined team setup and current scope, use:
@@ -868,7 +876,7 @@ After the demo, restore `LOCAL_TARGET_MODE=protected` and recreate the worker wi
 Run controlled database integration tests:
 
 ```powershell
-docker compose exec celery python -m unittest app.test_pipeline -v
+docker compose exec celery python -m unittest app.tests.test_pipeline -v
 ```
 
 These tests use supplied responses and roll back their own database changes.
@@ -881,7 +889,7 @@ docker compose up -d --build api celery
 
 Press Ctrl+C in the foreground Compose terminal to stop the services. Named volumes preserve PostgreSQL data and Ollama models. Do not use `docker compose down -v` unless you intend to delete those volumes.
 
-The Week 1 instructions above describe the original demo. For the current Week 2 setup, follow the authentication guide below before starting services or accessing targets and scans. Adaptive judging and full garak/PyRIT orchestration remain future integration work.
+The Week 1 instructions above describe the original demo. Follow the current backend guide at the top of this README and the authentication guide below before starting services or accessing targets and scans. Week 2 added connected PyRIT/garak execution; adaptive judging remains future work.
 
 ## Week 2 backend updates
 

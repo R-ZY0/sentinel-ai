@@ -5,7 +5,7 @@ Date: 2026-10-19
 ## Commands run
 
 ```powershell
-docker compose exec api python -m unittest app.test_api_errors app.test_scan_submission -v
+docker compose exec api python -m unittest app.tests.test_api_errors app.tests.test_scan_submission -v
 ```
 
 Result:
@@ -13,7 +13,7 @@ Ran 4 tests in 0.348s
 OK
 
 
-docker compose exec celery python -m unittest app.test_pipeline -v
+docker compose exec celery python -m unittest app.tests.test_pipeline -v
 
 
 Result:
@@ -33,7 +33,7 @@ Coverage of these checks
 ## Target CRUD verification — 2026-10-29
 
 Command:
-docker compose exec api python -m unittest app.test_targets app.test_api_errors app.test_scan_submission app.test_pipeline -v
+docker compose exec api python -m unittest app.tests.test_targets app.tests.test_api_errors app.tests.test_scan_submission app.tests.test_pipeline -v
 
 Result: Ran 14 tests in 0.749s — OK.
 
@@ -48,7 +48,7 @@ The database integration tests roll back their changes after execution.
 ## Authentication verification — 2026-10-29
 
 Command:
-docker compose exec api python -m unittest app.test_auth app.test_targets app.test_api_errors app.test_scan_submission app.test_pipeline -v
+docker compose exec api python -m unittest app.tests.test_auth app.tests.test_targets app.tests.test_api_errors app.tests.test_scan_submission app.tests.test_pipeline -v
 
 Result: Ran 21 tests in 1.546s — OK.
 
@@ -64,7 +64,8 @@ Authentication coverage:
 
 Target CRUD, API error handling, queue submission, and pipeline tests also pass.
 
-Limitation: authenticated users currently share targets and scans. Per-user ownership is not implemented.
+Historical Week 2 limitation: authenticated users shared targets and scans.
+Weeks 3–4 add ownership for new records and preserve unowned legacy records as shared.
 
 ## Authenticated live scan — 2026-10-29
 

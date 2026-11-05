@@ -9,7 +9,7 @@ from sqlalchemy import create_engine, select
 from sqlalchemy.orm import Session
 from app.models import Base, Target, Scan, AttackAttempt, Response, Finding
 from app.schema_migrations import ensure_attack_case_id_column
-from app.attack_persistence import persist_attack_run
+from app.services.attack_persistence import persist_attack_run
 from attack_engine.attack_run import AttackRun
 
 

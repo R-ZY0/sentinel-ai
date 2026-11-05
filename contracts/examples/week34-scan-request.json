@@ -1,0 +1,8 @@
+{
+  "target_id": "d3b2882b-aabf-4533-ac18-6d82e3b4ac39",
+  "configuration": {
+    "engines": ["pyrit", "garak"],
+    "attack_ids": ["PYRIT-PI-001", "GARAK-DAN-001"]
+  },
+  "auto_start": false
+}

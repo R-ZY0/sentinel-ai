@@ -58,7 +58,7 @@ Run Attack Engine component tests:
 
 Run backend pipeline tests:
 
-    .\.venv\Scripts\python.exe -m pytest .\backend\app\test_pipeline.py -v
+    .\.venv\Scripts\python.exe -m pytest .\backend\app\tests\test_pipeline.py -v
 
 ## Authorized Use
 

@@ -6,7 +6,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 from app.database import Base
 from app.models import Target, Scan, AttackAttempt, Response, Finding
-from app.attack_persistence import persist_attack_run
+from app.services.attack_persistence import persist_attack_run
 from attack_engine.attack_run import AttackRun
 
 

@@ -4,7 +4,7 @@ import unittest
 from unittest.mock import patch
 
 from attack_engine.attack_library import ATTACK_LIBRARY
-from app.attack_engine import AttackEngine
+from app.services.attack_engine import AttackEngine
 
 
 class FullScanSelectionTests(unittest.TestCase):

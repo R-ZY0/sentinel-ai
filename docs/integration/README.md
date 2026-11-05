@@ -218,7 +218,7 @@ from sqlalchemy import select
 from app.database import SessionLocal
 from app.models import Target, Scan, AttackAttempt, Response
 from app.local_target import OLLAMA_BASE_URL, LOCAL_TARGET_MODE
-from app.scan_tasks import run_scan
+from app.tasks.scans import run_scan
 from attack_engine.attack_library import ATTACK_LIBRARY
 
 assert LOCAL_TARGET_MODE == "protected", "Use protected local target only"
@@ -327,7 +327,7 @@ From a working stack:
 
 ```powershell
 # Basic API and queue-submit handling
-docker compose exec -T api python -m unittest -v app.test_api_errors app.test_scan_submission
+docker compose exec -T api python -m unittest -v app.tests.test_api_errors app.tests.test_scan_submission
 
 # Database pipeline regression suite (mocked model output; currently 6 tests)
 # Prefer CI PostgreSQL acceptance for repeatable, isolated DB verification.

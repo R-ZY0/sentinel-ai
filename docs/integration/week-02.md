@@ -79,7 +79,7 @@ No numeric CVSS score is inferred.
 
 Run the backend suite:
 
-    docker compose exec api python -m unittest app.test_week2_pipeline app.test_tool_client app.test_tool_service app.test_tool_process app.test_auth app.test_targets app.test_api_errors app.test_scan_submission app.test_pipeline -v
+    docker compose exec api python -m unittest app.tests.test_week2_pipeline app.tests.test_tool_client app.tests.test_tool_service app.tests.test_tool_process app.tests.test_auth app.tests.test_targets app.tests.test_api_errors app.tests.test_scan_submission app.tests.test_pipeline -v
 
 These tests use controlled target/judge fixtures and PostgreSQL transactions.
 Their database changes are rolled back.

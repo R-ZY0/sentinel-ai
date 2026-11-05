@@ -1,0 +1,39 @@
+name: Week 3-4 backend acceptance
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [develop, integration/week-03, integration/week-04]
+  pull_request:
+    branches: [release/week-03, release/week-04]
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    env:
+      POSTGRES_DB: sentinel_ci
+      POSTGRES_USER: sentinel_ci
+      POSTGRES_PASSWORD: sentinel_ci_only
+      POSTGRES_PORT: "15432"
+      REDIS_PORT: "16379"
+      JWT_SECRET_KEY: ci-only-signing-key-never-use-outside-tests
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate Compose
+        run: docker compose config --quiet
+      - name: Build backend once
+        run: docker compose build api
+      - name: Start database and queue
+        run: docker compose up -d --wait postgres redis
+      - name: Apply versioned migrations twice
+        run: |
+          docker compose run --rm --no-deps api python -m app.migrations
+          docker compose run --rm --no-deps api python -m app.migrations
+      - name: Combined backend acceptance against PostgreSQL
+        run: docker compose run --rm --no-deps api python -m unittest discover -s app/tests -t . -v
+      - name: Logs on failure
+        if: failure()
+        run: docker compose logs --tail=80 postgres redis
+      - name: Stop CI services
+        if: always()
+        run: docker compose down
