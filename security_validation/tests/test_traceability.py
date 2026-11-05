@@ -104,6 +104,55 @@ class EvidenceTraceabilityTests(unittest.TestCase):
         self.assertFalse(result["evidence_receipt"]["response_present"])
         self.assertTrue(check(result["evidence_receipt"], record, result))
 
+    def test_receipt_rejects_evidence_from_different_attempt(self):
+        record = case()
+        result = attest(record)
+        changed = copy.deepcopy(result)
+        changed["validation"]["evidence"][0]["attempt_id"] = "another-attempt"
+        changed["finding"]["evidence"][0]["attempt_id"] = "another-attempt"
+        from security_validation.src.traceability import build_evidence_receipt
+        attack_run, response = from_backend_records(
+            record["attempt"], record["response"], test_case_id=record["test_case_id"]
+        )
+        with self.assertRaises(ValueError):
+            build_evidence_receipt(
+                attack_run, response, changed["validation"], changed["finding"],
+                trusted_fixture=record["trusted_fixture"], audit_key=KEY,
+                recorded_at=TIME,
+            )
+
+    def test_receipt_rejects_missing_response_attempt_identity(self):
+        record = case()
+        result = attest(record)
+        from security_validation.src.traceability import build_evidence_receipt
+        attack_run, response = from_backend_records(
+            record["attempt"], record["response"], test_case_id=record["test_case_id"]
+        )
+        response.pop("attempt_id")
+        with self.assertRaises(ValueError):
+            build_evidence_receipt(
+                attack_run, response, result["validation"], result["finding"],
+                trusted_fixture=record["trusted_fixture"], audit_key=KEY,
+                recorded_at=TIME,
+            )
+
+    def test_receipt_rejects_confirmed_without_validated_leakage(self):
+        record = case()
+        result = attest(record)
+        changed = copy.deepcopy(result)
+        changed["validation"]["evidence"][0]["validated"] = False
+        changed["finding"]["evidence"][0]["validated"] = False
+        from security_validation.src.traceability import build_evidence_receipt
+        attack_run, response = from_backend_records(
+            record["attempt"], record["response"], test_case_id=record["test_case_id"]
+        )
+        with self.assertRaises(ValueError):
+            build_evidence_receipt(
+                attack_run, response, changed["validation"], changed["finding"],
+                trusted_fixture=record["trusted_fixture"], audit_key=KEY,
+                recorded_at=TIME,
+            )
+
     def test_naive_timestamp_is_rejected(self):
         with self.assertRaises(ValueError):
             validate_and_attest_backend_execution(
