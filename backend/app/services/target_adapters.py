@@ -65,6 +65,19 @@ class TargetAdapter:
             body.update(self.configuration.get("static_body", {}))
             field = self.configuration.get("response_field", "response")
             url = self.endpoint
+        return self._post(body, url, field)
+
+    def respond_messages(self, messages):
+        """Server-owned fixture messages for the configured local Ollama target."""
+        require_scan_compatible(self.target)
+        if self.endpoint not in allowed_endpoints():
+            raise TargetAdapterError("Endpoint is not approved by the server")
+        body = build_ollama_request("")
+        body["messages"] = messages
+        body["model"] = self.configuration.get("model", OLLAMA_MODEL)
+        return self._post(body, self.endpoint + "/api/chat", "message.content")
+
+    def _post(self, body, url, field):
         start = time.monotonic()
         request = Request(url, data=json.dumps(body).encode(),
                           headers={"Content-Type": "application/json"}, method="POST")

@@ -106,9 +106,9 @@ class TestBackendContract(unittest.TestCase):
     def test_actual_backend_model_shapes(self):
         """Compare against the team's actual SQLAlchemy model source."""
         root = Path(__file__).resolve().parent.parent
-        source_file = root / "backend" / "app" / "models.py"
+        source_file = root / "backend" / "app" / "models" / "__init__.py"
         if not source_file.is_file():
-            self.fail("Backend models.py missing")
+            self.fail("Backend model package missing")
 
         tree = ast.parse(
             source_file.read_text(encoding="utf-8-sig")
@@ -140,7 +140,10 @@ class TestBackendContract(unittest.TestCase):
         self.assertTrue({
             "id", "scan_id", "category", "payload", "status"
         }.issubset(attempt_fields))
-        self.assertNotIn("attack_id", attempt_fields)
+        # Week 4 adds an optional catalog FK; exported external case IDs still
+        # belong in attack_case_id, never the attempt UUID or inferred FK.
+        self.assertIn("attack_case_id", attempt_fields)
+        self.assertIn("attack_id", attempt_fields)
 
         self.assertTrue({
             "attack_attempt_id", "content"
@@ -153,6 +156,7 @@ class TestBackendContract(unittest.TestCase):
         )
 
         self.assertTrue(set(result.attempt).issubset(attempt_fields))
+        self.assertNotIn("attack_id", result.attempt)
         self.assertTrue(set(result.response).issubset(response_fields))
 
 

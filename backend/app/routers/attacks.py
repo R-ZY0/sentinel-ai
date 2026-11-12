@@ -13,6 +13,8 @@ router = APIRouter(prefix="/attacks", tags=["Attacks"], dependencies=[Depends(ge
 def list_attacks(db: Session = Depends(get_db)):
     sync_catalog(db)
     db.commit()
+    from ..services.week34_scenarios import CASE_BY_ATTACK
     return [{"id": item.id, "name": item.name, "engine": item.engine,
+             "test_case_id": CASE_BY_ATTACK.get(item.id),
              "category": item.category, "active": item.active}
             for item in db.scalars(select(Attack).order_by(Attack.engine, Attack.id)).all()]

@@ -19,6 +19,7 @@ TOOL_URLS = {
 class ExecutedToolAttack:
     attack: AttackRun
     source_attempt_id: str | None = None
+    tool_version: str | None = None
 
 
 def execute_tool_attacks(tool: str) -> tuple[list[ExecutedToolAttack], str, dict]:
@@ -78,7 +79,7 @@ def execute_tool_attacks(tool: str) -> tuple[list[ExecutedToolAttack], str, dict
         if run.strategy != {"pyrit": "pyrit", "garak": "garak-cli-report"}[tool]:
             raise ValueError("Scanner returned an unexpected execution strategy")
         seen.add(identity)
-        runs.append(ExecutedToolAttack(run, source_id))
+        runs.append(ExecutedToolAttack(run, source_id, payload.get("tool_version")))
     fixture = {
         "test_case_id": "TC-002", "target_authorized": True,
         "requester_authorized": False, "source_verified": True,

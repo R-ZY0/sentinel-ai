@@ -1,5 +1,12 @@
 # Security Validation — Week 3/4 integration handoff
 
+Combined-integration note: the sections below describe the contributor's delivery
+against Week 2. The backend now uses `app/services`, `app/tasks`, and `app/tests`.
+The new `week34` profile adds five-case execution and persisted signed receipts;
+the original `week2` profile is retained. See the current
+[integration runbook](../docs/integration/week-03-04-release.md) for verification
+status and the distinction between controlled tests and live acceptance.
+
 Base: `release/week-02`. This component stays read-only; it does not modify SQLAlchemy models, the shared finding JSON Schema, or the attack/judge contracts.
 
 ## Week 3: Evidence provenance and validation

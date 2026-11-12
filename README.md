@@ -7,6 +7,10 @@ Sentinel AI is a web-based AI security testing platform designed to assess autho
 
 ## Current backend: Weeks 3–4
 
+For the combined four-member delivery, use the
+[Week 3–4 integration/release runbook](docs/integration/week-03-04-release.md).
+It documents the connected five-scenario LLM/evidence pipeline and live release gates.
+
 Target types/validation, per-user ownership, configured scans, explicit start/cancel,
 database migrations, and the organized backend layout are documented in the
 [Week 3–4 backend guide](docs/integration/week-03-04-backend.md).

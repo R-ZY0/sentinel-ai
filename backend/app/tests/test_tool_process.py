@@ -36,6 +36,7 @@ class ToolProcessTests(unittest.TestCase):
                 patch.object(tool_process.sys, "argv", ["tool_process", tool, str(output)]),
                 patch.object(tool_process.sys, "stdin", io.StringIO(json.dumps({"canary": canary}))),
                 patch.object(tool_process, "run_" + tool, scanner),
+                patch.object(tool_process, "version", return_value="controlled-test-version"),
             ):
                 if valid_response:
                     tool_process.main()

@@ -4,6 +4,7 @@ import json
 import sys
 from dataclasses import asdict
 from pathlib import Path
+from importlib.metadata import version
 
 from attack_engine.attack_run import AttackRun
 from .. import local_target
@@ -93,6 +94,7 @@ def main():
         records.append(record)
     Path(output_name).write_text(json.dumps({
         "tool": tool, "target": local_target.OLLAMA_BASE_URL,
+        "tool_version": version(tool),
         "target_mode": "protected", "attack_runs": records,
     }), encoding="utf-8")
 

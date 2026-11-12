@@ -7,7 +7,7 @@ from datetime import datetime, timezone
 from sqlalchemy import inspect, text
 from .database import Base
 
-REVISION = "0002_targets_and_scans"
+REVISION = "0003_week34_integration"
 
 
 def upgrade(engine):
@@ -33,6 +33,8 @@ def upgrade(engine):
                 "error_code": "VARCHAR(80)", "task_id": "VARCHAR(36)",
             },
             "attack_attempts": {
+                "test_case_id": "VARCHAR(30)",
+                "execution_metadata": "JSON",
                 "attack_case_id": "VARCHAR(100)",
                 # attacks is created below before this FK is added.
                 "attack_id": "VARCHAR(100) REFERENCES attacks(id)",
@@ -53,7 +55,8 @@ def upgrade(engine):
         Base.metadata.create_all(connection)
         for table, column in [("targets", "owner_id"), ("scans", "owner_id"),
                               ("scans", "target_id"), ("scans", "status"),
-                              ("attack_attempts", "attack_id"), ("attack_attempts", "attack_case_id")]:
+                              ("attack_attempts", "attack_id"), ("attack_attempts", "attack_case_id"),
+                              ("attack_attempts", "test_case_id")]:
             connection.execute(text(f"CREATE INDEX IF NOT EXISTS ix_{table}_{column} ON {table} ({column})"))
         connection.execute(text(
             "INSERT INTO schema_revisions (revision, applied_at) VALUES (:revision, :now) ON CONFLICT (revision) DO NOTHING"

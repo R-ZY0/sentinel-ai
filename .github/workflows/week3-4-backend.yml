@@ -3,9 +3,9 @@ name: Week 3-4 backend acceptance
 on:
   workflow_dispatch:
   push:
-    branches: [develop, integration/week-03, integration/week-04]
+    branches: [develop, integration/week-03, integration/week-04, integration/week-03-04]
   pull_request:
-    branches: [release/week-03, release/week-04]
+    branches: [release/week-03, release/week-04, release/week-03-04]
 
 jobs:
   backend:
@@ -17,6 +17,7 @@ jobs:
       POSTGRES_PORT: "15432"
       REDIS_PORT: "16379"
       JWT_SECRET_KEY: ci-only-signing-key-never-use-outside-tests
+      EVIDENCE_AUDIT_KEY: "1111111111111111111111111111111111111111111111111111111111111111"
     steps:
       - uses: actions/checkout@v4
       - name: Validate Compose
@@ -31,6 +32,23 @@ jobs:
           docker compose run --rm --no-deps api python -m app.migrations
       - name: Combined backend acceptance against PostgreSQL
         run: docker compose run --rm --no-deps api python -m unittest discover -s app/tests -t . -v
+      - name: Security, new judge and dataset handoff tests
+        run: |
+          docker compose run --rm --no-deps api python -m unittest discover -s security_validation/tests -t . -v
+          docker compose run --rm --no-deps api python -m unittest judge.tests.test_week3_llm_judge judge.tests.test_week3_trusted_evidence judge.tests.test_week4_leakage_labels judge.tests.test_week4_jbb_datasets -v
+      - name: Normalized attack library and executable runner
+        run: >-
+          docker compose run --rm --no-deps api python -m unittest
+          attack_engine.test_attack_runner attack_engine.test_attack_schema
+          attack_engine.test_attack_registry attack_engine.test_normalized_attack_library
+          attack_engine.test_normalized_execution attack_engine.test_normalized_runner_compatibility -v
+      - name: Existing attack contracts and compatibility regressions
+        run: >-
+          docker compose run --rm --no-deps api python -m unittest
+          attack_engine.test_attack_library_runner attack_engine.test_attack_run
+          attack_engine.test_basic_judge attack_engine.test_execution_contract
+          attack_engine.test_backend_contract attack_engine.test_second_round
+          attack_engine.test_second_round_integration attack_engine.test_finding_repository -v
       - name: Logs on failure
         if: failure()
         run: docker compose logs --tail=80 postgres redis

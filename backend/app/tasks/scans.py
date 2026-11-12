@@ -31,7 +31,10 @@ def run_scan(scan_id: str):
         db.add(AuditLog(action="scan.running", scan_id=id, resource_id=str(id), details={}))
         db.commit()
         try:
-            if pipeline == "week2":
+            if pipeline == "week34":
+                from ..services.week34_runner import Week34AttackRunner
+                runner = Week34AttackRunner()
+            elif pipeline == "week2":
                 from ..services.week2_runner import Week2AttackRunner
                 runner = Week2AttackRunner()
             elif pipeline == "week1":

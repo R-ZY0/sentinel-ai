@@ -1,4 +1,4 @@
-from attack_engine.attack_library import ATTACK_LIBRARY
+from attack_engine.normalized_attack_library import NORMALIZED_ATTACK_LIBRARY
 from sqlalchemy import select
 from ..models import Attack
 
@@ -6,7 +6,7 @@ from ..models import Attack
 def sync_catalog(db):
     definitions = [dict(id=item.attack_id, name=item.attack_id, category=item.category,
         engine="library", payload=item.payload, strategy=item.strategy,
-        expected_behavior=item.expected_behavior) for item in ATTACK_LIBRARY]
+        expected_behavior=item.expected_behavior) for item in NORMALIZED_ATTACK_LIBRARY]
     for id, engine, category in [("PYRIT-PI-001", "pyrit", "Prompt Injection"),
                                   ("GARAK-DAN-001", "garak", "Jailbreak")]:
         definitions.append(dict(id=id, name=id, engine=engine, category=category,
@@ -38,6 +38,10 @@ def select_attacks(db, config):
         item = all_attacks.get(id)
         if item is None or not item.active or item.engine not in config.engines:
             raise ValueError("Unknown, inactive or engine-incompatible attack selection")
+        if config.pipeline == "week34":
+            from .week34_scenarios import CASE_BY_ATTACK
+            if id not in CASE_BY_ATTACK:
+                raise ValueError("Attack has no trusted Week 3-4 scenario mapping")
         attacks.append(item)
     if set(config.engines) != {attack.engine for attack in attacks}:
         raise ValueError("Each selected engine must have an attack selected")

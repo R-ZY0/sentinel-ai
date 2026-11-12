@@ -180,6 +180,7 @@ class AuthTests(unittest.TestCase):
             ("DELETE", f"/targets/{record_id}", None),
             ("POST", "/scans", {"target_id": record_id}),
             ("GET", f"/scans/{record_id}", None),
+            ("GET", f"/scans/{record_id}/results", None),
             ("GET", "/scans", None),
             ("GET", "/attacks", None),
             ("POST", f"/targets/{record_id}/validate", None),

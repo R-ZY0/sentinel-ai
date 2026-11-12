@@ -113,6 +113,8 @@ class AttackAttempt(Base):
         String(100), nullable=True, index=True
     )
     attack_id: Mapped[str | None] = mapped_column(ForeignKey("attacks.id"), index=True)
+    test_case_id: Mapped[str | None] = mapped_column(String(30), index=True)
+    execution_metadata: Mapped[dict | None] = mapped_column(JSON)
     scan: Mapped["Scan"] = relationship(back_populates="attempts")
     attack: Mapped["Attack | None"] = relationship()
     responses: Mapped[list["Response"]] = relationship(back_populates="attempt")
@@ -181,6 +183,16 @@ class ResponseEvaluation(Base):
         DateTime(timezone=True),
         default=utc_now,
     )
+
+
+class EvidenceReceipt(Base):
+    """Backend envelope around the security team's unchanged signed receipt."""
+    __tablename__ = "evidence_receipts"
+    id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4)
+    response_id: Mapped[UUID] = mapped_column(ForeignKey("responses.id"), unique=True)
+    key_id: Mapped[str] = mapped_column(String(32))
+    receipt: Mapped[dict] = mapped_column(JSON)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now)
 
 
 class Evidence(Base):

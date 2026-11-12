@@ -30,6 +30,12 @@ def queue_scan(db, scan, user):
     except TargetAdapterError as exc:
         raise HTTPException(409, str(exc)) from None
     if scan.configuration:
+        if scan.configuration.pipeline == "week34":
+            from ..services.receipts import audit_key
+            try:
+                audit_key()
+            except ValueError:
+                raise HTTPException(503, "Week 3-4 evidence signing is not configured on the server") from None
         snapshot = scan.configuration.target_snapshot
         if snapshot != target_snapshot(target):
             raise HTTPException(409, "Target changed after scan creation; create a new scan")
@@ -71,14 +77,13 @@ def create_scan(payload: ScanCreate, response: HttpResponse, db: Session = Depen
     scan = Scan(target_id=target.id, owner_id=user.id, status="created")
     db.add(scan)
     db.flush()
-    configuration = ScanConfiguration(scan_id=scan.id, pipeline="week2",
+    configuration = ScanConfiguration(scan_id=scan.id, pipeline=payload.configuration.pipeline,
         engines=payload.configuration.engines, target_snapshot=target_snapshot(target))
     db.add(configuration)
     db.flush()
     for position, attack in enumerate(attacks):
         db.add(ScanAttack(configuration_id=configuration.id, attack_id=attack.id, position=position,
-            definition={key: getattr(attack, key) for key in
-                ("id", "category", "engine", "payload", "strategy", "expected_behavior")}))
+            definition=definition_snapshot(attack)))
     audit(db, "scan.created", scan.id, user=user, scan_id=scan.id)
     db.commit()
     db.refresh(scan)
@@ -86,6 +91,18 @@ def create_scan(payload: ScanCreate, response: HttpResponse, db: Session = Depen
         response.status_code = 202
         return queue_scan(db, scan, user)
     return scan
+
+
+def definition_snapshot(attack):
+    from ..services.week34_scenarios import CASE_BY_ATTACK
+    from attack_engine.normalized_attack_library import NORMALIZED_ATTACK_LIBRARY
+    definition = {key: getattr(attack, key) for key in
+                  ("id", "category", "engine", "payload", "strategy", "expected_behavior")}
+    normalized = next((item for item in NORMALIZED_ATTACK_LIBRARY if item.attack_id == attack.id), None)
+    if normalized:
+        definition["normalized_definition"] = normalized.to_dict()
+    definition["test_case_id"] = CASE_BY_ATTACK.get(attack.id)
+    return definition
 
 
 @router.get("", response_model=list[ScanRead])

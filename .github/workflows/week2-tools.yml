@@ -1,12 +1,14 @@
-name: Week 2 attack tools
+name: Isolated attack tools
 
 on:
   push:
     branches:
       - integration/week-02
+      - integration/week-03-04
   pull_request:
     branches:
       - release/week-02
+      - release/week-03-04
 
 jobs:
   tool-tests:

@@ -32,6 +32,7 @@ services:
       POSTGRES_PORT: "5432"
       JWT_SECRET_KEY: ${JWT_SECRET_KEY:?Set JWT_SECRET_KEY in .env}
       TARGET_ALLOWED_ENDPOINTS: ${TARGET_ALLOWED_ENDPOINTS:-http://ollama:11434}
+      EVIDENCE_AUDIT_KEY: ${EVIDENCE_AUDIT_KEY:-}
   postgres:
     image: postgres:16
     container_name: sentinel-postgres
@@ -80,6 +81,9 @@ services:
       JUDGE_MODEL: llama3.2:3b
       PYTHONPATH: /app
       WEEK2_ATTACK_ENGINES: ${WEEK2_ATTACK_ENGINES:-pyrit,garak}
+      EVIDENCE_AUDIT_KEY: ${EVIDENCE_AUDIT_KEY:-}
+      TARGET_ALLOWED_ENDPOINTS: ${TARGET_ALLOWED_ENDPOINTS:-http://ollama:11434}
+      WEEK34_TARGET_MODE: ${WEEK34_TARGET_MODE:-protected}
     depends_on:
       redis:
         condition: service_healthy

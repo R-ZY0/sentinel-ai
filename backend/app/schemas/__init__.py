@@ -16,6 +16,7 @@ class TargetConfiguration(BaseModel):
 
 class ScanConfigurationCreate(BaseModel):
     model_config = ConfigDict(extra="forbid")
+    pipeline: Literal["week2", "week34"] = "week2"
     engines: list[Literal["library", "pyrit", "garak"]] = Field(default_factory=lambda: ["pyrit", "garak"], min_length=1, max_length=3)
     attack_ids: list[str] = Field(default_factory=list, max_length=17)
 
