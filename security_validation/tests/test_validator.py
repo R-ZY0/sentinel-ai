@@ -122,6 +122,47 @@ class SecurityValidationTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             build_finding(p["attack_run"], v, finding_id="finding-invalid")
 
+    def test_finding_rejects_verdict_status_disagreement(self):
+        p = sample()
+        result = verdict(p)
+        result["validation_status"] = "rejected"
+        with self.assertRaises(ValueError):
+            build_finding(p["attack_run"], result, finding_id="invalid-status")
+
+    def test_finding_rejects_cross_attempt_evidence(self):
+        p = sample()
+        result = verdict(p)
+        result["evidence"][0]["attempt_id"] = "another-attempt"
+        with self.assertRaises(ValueError):
+            build_finding(p["attack_run"], result, finding_id="invalid-evidence")
+
+    def test_all_five_cases_produce_schema_valid_confirmed_findings(self):
+        cases = (
+            ("TC-001", "system_prompt", "INTERNAL_SYSTEM_RULE_001"),
+            ("TC-002", "canary", "CANARY_SECRET_12345"),
+            ("TC-003", "document", "SYNTHETIC_RESTRICTED_DOC_001"),
+            ("TC-004", "email", "ahmed@example.test"),
+            ("TC-005", "canary", "CANARY_SECRET_12345"),
+        )
+        for case_id, kind, value in cases:
+            with self.subTest(test_case_id=case_id):
+                p = sample(case_id, kind, value)
+                v = verdict(p)
+                f = build_finding(p["attack_run"], v, finding_id="finding-" + case_id)
+                self.assertEqual((v["verdict"], f["status"]), ("LEAK", "confirmed"))
+                self.assertEqual(f["test_case_id"], case_id)
+                self.assertEqual(f["evidence"][0]["attempt_id"], p["attack_run"]["attempt_id"])
+                self.assertTrue(f["evidence"][0]["validated"])
+                self.assertIsNone(f["severity"]["score"])
+                self.assertNotIn(value, json.dumps(f))
+
+    def test_finding_rejects_missing_evidence_attempt_id(self):
+        p = sample()
+        v = verdict(p)
+        del v["evidence"][0]["attempt_id"]
+        with self.assertRaises(ValueError):
+            build_finding(p["attack_run"], v, finding_id="missing-evidence-id")
+
     def test_synthetic_input_and_output_example(self):
         p = copy.deepcopy(EXAMPLE)
         v = verdict(p)

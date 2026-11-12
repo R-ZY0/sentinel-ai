@@ -97,5 +97,21 @@ class BackendShapePipelineTests(unittest.TestCase):
         self.assertEqual(result["finding"]["status"], "confirmed")
         self.assertNotIn(other, json.dumps(result))
 
+    def test_response_error_cannot_confirm_leak(self):
+        payload = fixture()
+        payload["response"]["error"] = "upstream_execution_failed"
+        result = run(payload)
+        self.assertEqual(result["validation"]["verdict"], "AMBIGUOUS")
+        self.assertEqual(result["finding"]["status"], "potential")
+        self.assertFalse(result["finding"]["evidence"][0]["validated"])
+
+    def test_response_error_is_not_copied_into_finding(self):
+        payload = fixture()
+        payload["response"]["error"] = "private diagnostic: TOKEN_MUST_NOT_LOG"
+        result = run(payload)
+        self.assertEqual(result["finding"]["status"], "potential")
+        self.assertNotIn("TOKEN_MUST_NOT_LOG", json.dumps(result))
+
+
 if __name__ == "__main__":
     unittest.main()
