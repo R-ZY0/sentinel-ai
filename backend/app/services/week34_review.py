@@ -7,6 +7,7 @@ import json
 import hashlib
 from pathlib import Path
 from judge.datasets.leakage_labels import load_leakage_dataset
+from judge.datasets import leakage_labels
 
 from judge.canary_judge import CanaryRegexJudge
 from judge.week3_llm_judge import Week3LLMJudge
@@ -47,7 +48,7 @@ def runtime_metadata():
 
 @lru_cache(maxsize=1)
 def dataset_metadata():
-    path = Path(__file__).resolve().parents[3] / "judge/datasets/tc_week34_synthetic.json"
+    path = Path(leakage_labels.__file__).with_name("tc_week34_synthetic.json")
     cases = load_leakage_dataset(path)
     return {"source": "judge/datasets/tc_week34_synthetic.json",
         "sha256": hashlib.sha256(path.read_bytes()).hexdigest(),

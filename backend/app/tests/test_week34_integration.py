@@ -148,6 +148,17 @@ class Week34IntegrationTests(unittest.TestCase):
             self.assertEqual(self.client.post(f"/scans/{scan['id']}/start").status_code, 503)
             queue.assert_not_called()
 
+    def test_dataset_resource_does_not_depend_on_backend_container_layout(self):
+        from ..services import week34_review
+        week34_review.dataset_metadata.cache_clear()
+        try:
+            with patch.object(week34_review, "__file__", "/app/app/services/week34_review.py"):
+                metadata = week34_review.dataset_metadata()
+            self.assertEqual(len(metadata["sha256"]), 64)
+            self.assertIn("TC-001-SAFE", metadata["case_ids"])
+        finally:
+            week34_review.dataset_metadata.cache_clear()
+
     def test_scanner_failure_retains_structured_attempt(self):
         scan = self.scan(configuration={"pipeline": "week34", "engines": ["garak"]})
         with patch("app.routers.scans.run_scan.apply_async"):

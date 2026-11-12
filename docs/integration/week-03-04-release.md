@@ -180,8 +180,8 @@ not retain the protected fixture value as metadata or copy it into audit logs.
 ## Acceptance status
 
 - All four workstreams are merged locally with original branch history.
-- 331 local automated tests pass, including the new backend integration and
-  contributor suites. The backend gate currently contains 77 tests.
+- 332 local automated tests pass, including the new backend integration and
+  contributor suites. The backend gate currently contains 78 tests.
 - Five safe and five controlled-leak cases exercise the actual normalized runner,
   Week3LLMJudge, independent validator, schema validation, database persistence,
   redaction, receipt integrity, mappings and owner-scoped retrieval. Network and
