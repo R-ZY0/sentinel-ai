@@ -1,5 +1,6 @@
 import ast
 import unittest
+import importlib.util
 from pathlib import Path
 from uuid import UUID, uuid4
 
@@ -105,8 +106,7 @@ class TestBackendContract(unittest.TestCase):
 
     def test_actual_backend_model_shapes(self):
         """Compare against the team's actual SQLAlchemy model source."""
-        root = Path(__file__).resolve().parent.parent
-        source_file = root / "backend" / "app" / "models" / "__init__.py"
+        source_file = Path(importlib.util.find_spec("app.models").origin)
         if not source_file.is_file():
             self.fail("Backend model package missing")
 
