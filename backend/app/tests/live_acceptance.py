@@ -91,7 +91,16 @@ def main():
             raise RuntimeError("Target/judge model version digests were not recorded")
         if row["execution"]["engine"] in {"pyrit", "garak"} and not row["execution"].get("tool_version"):
             raise RuntimeError("Tool version was not recorded")
-        findings += row["security"]["finding"]["status"] == "confirmed"
+        document = row["security"]["finding"]
+        if document["status"] == "confirmed":
+            persisted = next((item for item in row["persisted_findings"] if item["id"] == document["finding_id"]), None)
+            if (not persisted or persisted["status"] != "confirmed"
+                    or persisted["category"] != document["category"] or not persisted["evidence_count"]
+                    or set(persisted["mapping_taxonomies"]) != {"owasp", "cwe"}):
+                raise RuntimeError("Confirmed finding lacks matching persisted evidence/mapping rows")
+            findings += 1
+        elif row["persisted_findings"]:
+            raise RuntimeError("Non-confirmed validation unexpectedly created a finding row")
         print(row["catalog_attack_id"], row["test_case_id"],
               "judge=" + comparison["llm_judge"]["verdict"],
               "security=" + row["security"]["validation"]["verdict"], "receipt=verified", flush=True)

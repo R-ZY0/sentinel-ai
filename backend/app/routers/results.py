@@ -2,10 +2,10 @@
 from uuid import UUID
 from fastapi import APIRouter, Depends
 from sqlalchemy import select
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, selectinload
 from ..database import get_db
 from ..dependencies import get_current_user
-from ..models import Scan, User, AttackAttempt, Response, ResponseEvaluation, EvidenceReceipt
+from ..models import Scan, User, AttackAttempt, Response, ResponseEvaluation, EvidenceReceipt, Finding
 from ..services.access import require_visible
 from ..services.receipts import stored_receipt_integrity
 from ..services.audit import audit
@@ -17,6 +17,8 @@ router = APIRouter(prefix="/scans", tags=["Scan results"])
 def results(id: UUID, include_raw: bool = False, db: Session = Depends(get_db), user: User = Depends(get_current_user)):
     require_visible(db.get(Scan, id), user, "Scan")
     records = db.execute(select(AttackAttempt, Response, ResponseEvaluation, EvidenceReceipt)
+        .options(selectinload(Response.findings).selectinload(Finding.evidence_records),
+                 selectinload(Response.findings).selectinload(Finding.mappings))
         .outerjoin(Response, Response.attack_attempt_id == AttackAttempt.id)
         .outerjoin(ResponseEvaluation, ResponseEvaluation.response_id == Response.id)
         .outerjoin(EvidenceReceipt, EvidenceReceipt.response_id == Response.id)
@@ -31,6 +33,11 @@ def results(id: UUID, include_raw: bool = False, db: Session = Depends(get_db), 
             except (ValueError, TypeError, KeyError):
                 integrity = "unavailable"
         output.append({"attempt_id": str(attempt.id), "attack_id": attempt.attack_case_id,
+            "persisted_findings": [{"id": str(finding.id), "status": finding.status,
+                "category": finding.category, "severity": finding.severity,
+                "evidence_count": len(finding.evidence_records),
+                "mapping_taxonomies": sorted({item.taxonomy for item in finding.mappings})}
+                for finding in response.findings] if response else [],
             "catalog_attack_id": attempt.attack_id, "test_case_id": attempt.test_case_id,
             "status": attempt.status, "execution": metadata,
             "target_response": {"response_id": str(response.id),

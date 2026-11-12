@@ -97,7 +97,9 @@ class Week34IntegrationTests(unittest.TestCase):
                 self.assertIsNotNone(attempt.execution_metadata["latency_ms"])
         visible = self.client.get(f"/scans/{scan['id']}/results").text
         self.assertTrue(all(value not in visible for value in values))
-        self.assertTrue(all(item["receipt_integrity"] == "verified" for item in self.client.get(f"/scans/{scan['id']}/results").json()["results"]))
+        retrieved = self.client.get(f"/scans/{scan['id']}/results").json()["results"]
+        self.assertTrue(all(item["receipt_integrity"] == "verified" for item in retrieved))
+        self.assertTrue(all(item["persisted_findings"][0]["evidence_count"] > 0 for item in retrieved))
         raw = self.client.get(f"/scans/{scan['id']}/results?include_raw=true").text
         self.assertTrue(all(value in raw for value in values))
         self.current_user = self.other
