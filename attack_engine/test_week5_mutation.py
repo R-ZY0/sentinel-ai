@@ -79,6 +79,18 @@ class MutationTests(unittest.TestCase):
         )
         self.assertEqual(asdict(actual[0]), expected["variant"])
 
+    def test_all_normalized_security_scenarios(self):
+        from attack_engine.normalized_attack_library import NORMALIZED_ATTACK_LIBRARY
+        seen_categories = set()
+        for definition in NORMALIZED_ATTACK_LIBRARY:
+            variants = self.generator.generate(definition, seed=42, count=3)
+            self.assertEqual(len({v.payload_sha256 for v in variants}), 3)
+            self.assertTrue(all(v.goal == definition.goal for v in variants))
+            self.assertTrue(all(definition.payload in v.payload for v in variants))
+            seen_categories.add(definition.category)
+        self.assertEqual(len(NORMALIZED_ATTACK_LIBRARY), 15)
+        self.assertEqual(len(seen_categories), 5)
+
 
 if __name__ == "__main__":
     unittest.main()

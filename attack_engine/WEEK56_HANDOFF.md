@@ -1,4 +1,4 @@
-﻿# Sentinel AI — Attack Engine Weeks 5–6 Handoff
+# Sentinel AI — Attack Engine Weeks 5–6 Handoff
 
 ## Ownership
 Cybersecurity Member #1 — Attack Engine
@@ -38,13 +38,13 @@ Pytest 8.3.4
 
 ## Verified Results
 Core, Week 5/6 and regression selection:
-72 passed
+75 passed
 
 Backend and execution contract selection:
 23 passed
 
 Total across these two test selections:
-95 passed
+98 passed
 
 ## Limitations
 - Full optional PyRIT and Garak suites were not completed

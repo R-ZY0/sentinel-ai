@@ -68,6 +68,12 @@ async def execute_second_round(request: SecondRoundRequest, runner) -> SecondRou
         return SecondRoundResult("skipped", "History belongs to a different target")
     if request.history[0].attack_id != request.definition.attack_id:
         return SecondRoundResult("skipped", "History does not match attack definition")
+    if any(
+        item.attack_id != request.definition.attack_id
+        and not item.attack_id.startswith(request.definition.attack_id + "-")
+        for item in request.history
+    ):
+        return SecondRoundResult("skipped", "History includes an unrelated attack")
     if any(item.status != "completed" for item in request.history):
         return SecondRoundResult("skipped", "An execution failure cannot trigger another round")
 
@@ -98,10 +104,18 @@ async def execute_second_round(request: SecondRoundRequest, runner) -> SecondRou
             raise TypeError("runner must return AttackRun")
         if result is not run:
             raise ValueError("runner returned a different AttackRun object")
-        if result.attack_id != variant.attack_id or result.payload != variant.payload or result.target != request.target_name:
+        if (
+            result.attack_id != variant.attack_id
+            or result.payload != variant.payload
+            or result.target != request.target_name
+            or result.category != variant.category
+            or result.strategy != variant.strategy
+        ):
             raise ValueError("runner changed the variant identity or target")
         if result.status not in {"completed", "failed"}:
             raise ValueError("runner returned an invalid execution status")
+        if result.status == "completed" and not isinstance(result.actual_response, str):
+            raise ValueError("completed attempt must contain a text target response")
     except Exception as error:
         run.status = "failed"
         run.actual_response = None

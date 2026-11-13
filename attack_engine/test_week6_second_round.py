@@ -103,6 +103,29 @@ class Week6Tests(unittest.IsolatedAsyncioTestCase):
         self.assertIsNone(result.attack_run.actual_response)
         self.assertEqual(len(calls), 1)
 
+    async def test_unrelated_history_is_rejected(self):
+        definition, first = fixture()
+        unrelated = replace(first, attack_id="JB-001")
+        result = await execute_second_round(
+            SecondRoundRequest("SECOND_ROUND", definition, first.target, True,
+                               (first, unrelated), max_attempts=3),
+            AttackRunner(lambda _: self.fail("should not call target")),
+        )
+        self.assertEqual(result.status, "skipped")
+
+    async def test_missing_response_is_execution_failure(self):
+        definition, first = fixture()
+        class InvalidRunner:
+            def run(self, run):
+                run.status = "completed"
+                return run
+        result = await execute_second_round(
+            SecondRoundRequest("SECOND_ROUND", definition, first.target, True, (first,)),
+            InvalidRunner(),
+        )
+        self.assertEqual(result.status, "execution_failed")
+        self.assertEqual(result.attack_run.evaluation_status, "not_evaluated")
+
     async def test_async_runner_and_exception_mapping(self):
         definition, first = fixture()
         class AsyncRunner:

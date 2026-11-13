@@ -31,6 +31,9 @@ server-controlled authorization checks, never directly from the request body.
 Targets and history must match; a failed previous attempt cannot trigger a
 second round; attempt count must be bounded (1–10). The caller must provide
 the **complete persisted attempt history** to enable deduplication and limits.
+Concurrent controller tasks must serialize check-and-claim of the attempt
+budget in the database; this stateless module cannot prevent two workers
+from executing simultaneously with the same stale history snapshot.
 
 The controller owns ACCEPT/STOP/SECOND_ROUND decisions. This component does
 not create UUID attempt records, persist findings, call the Judge, or validate
